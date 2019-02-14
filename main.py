@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import Functions as func
+import functions as func
 
 import pyglet
 from gamestate import Gamestate
