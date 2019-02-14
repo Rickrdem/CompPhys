@@ -29,3 +29,31 @@ def dist(x1, x2, L):
 
     return dx
 
+def periodic_distance_vector(positions, boxsize=(1,1)):
+    """
+    Returns the smallest absolute distance given periodic boundaries defined by boxsize in the minimum image convention.
+    :param positions:
+    NxD matrix
+    :param boxsize:
+    Two-tuple containing the dimensions of the periodic bounds L
+    """
+    r = positions[:,0] + 1j*positions[:,1]
+    np.min(np.dstack([
+            np.abs(r-r[:,np.newaxis]),
+            np.abs(r-r[:,np.newaxis] - boxsize[0]),
+            np.abs(r - r[:, np.newaxis] + boxsize[0]),
+            np.abs(r - r[:, np.newaxis] - 1j*boxsize[1]),
+            np.abs(r - r[:, np.newaxis] + 1j*boxsize[1])]
+        ), axis=2)
+
+def distance_vector(positions):
+    """
+    Vectorized distance funtion for a
+    :param positions:
+    :return:
+    """
+    x = positions[:,0]
+    y = positions[:,1]
+    dx = x[:,np.newaxis]-x[:,np.newaxis].T
+    dy = y[:,np.newaxis]-y[:,np.newaxis].T
+    return np.sqrt(np.square(dx)+np.square(dy))
