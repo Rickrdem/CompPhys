@@ -1,45 +1,31 @@
 import numpy as np
 
+
 class Gamestate():
-    def randomise_state(self):
-        self.positions = np.random.randn(self.boids, 2)
-        self.positions[:, 0] *= self.size[0]
-        self.positions[:, 1] *= self.size[1]
-        self.directions = np.random.uniform(0, 2 * np.pi, self.boids)  # np.random.rand(self.boids)*np.pi%(2*np.pi)
-        print(np.sum(np.exp(1j * self.directions)))
-        print(circular_mean(self.directions) / np.pi)
+    def generate_state(self):
+        """ Generates a standard lattice of positions and velocities (currently random)
+        :return:
+        """
+        self.positions = np.random.randn(self.particles, self.dimensions) + np.array(self.size)/2
+        self.velocities = np.random.randn(self.particles, self.dimensions)
+        self.directions = np.angle(self.velocities[:,0]+1j*self.velocities[:,1])
 
-    #        print("boids",len(self.directions))
-    #        plt.hist(self.directions, bins=int(np.sqrt(len(self.directions))))
-
-    def __init__(self, boids=2000, size=(500, 500), eta=0.3, radius=10,
-                 drawevery=1):
-        self.boids = boids
+    def __init__(self, particles=2000, size=(500, 500), drawevery=1):
+        self.particles = particles
         self.size = size
-        self.eta = eta
-        self.radius = radius
-        self.randomise_state()
+        # self.dimensions = dimensions
+        self.dimensions = 2
         self.drawevery = drawevery
-        self.polarisation = []
-        self.mean = []
-        plt.hist(self.directions, int(np.sqrt(len(self.directions))))
-        plt.show()
+
+        self.generate_state()
 
     def update(self, a):
-        for step in range(self.drawevery):
-            #            noise = (np.random.rand(self.boids)-0.5) *2* np.pi
-            noise = np.random.uniform(-np.pi, np.pi, self.boids)
+        """ Updates the gamestate
 
-            self.directions = average_circular_directions(self.positions,
-                                                          self.directions,
-                                                          self.radius)  # *(1-self.eta)
-            self.directions += noise * self.eta
+        Moves all the particles around
+        :return:
+        """
+        self.positions = self.positions + self.velocities  #Move particles around
 
-            self.positions += np.array([np.cos(self.directions),
-                                        np.sin(self.directions)]).T
-            self.positions[:, 0] %= self.size[0]
-            self.positions[:, 1] %= self.size[1]
-
-            self.mean.append(circular_mean(self.directions))
-            self.polarisation.append(polarisation(self.directions))
-            self.directions %= (2 * np.pi)
+        self.positions[:, 0] %= self.size[0]  #Modulo the size of the space
+        self.positions[:, 1] %= self.size[1]
