@@ -14,7 +14,7 @@ class Viewport(pyglet.window.Window):
 
         gamestate = self.gamestate
         x, y = gamestate.positions.T
-        linelength = 10
+        linelength = 3
         windowsize = self.get_size()
 
         x = windowsize[0] * x / gamestate.size[0]

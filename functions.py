@@ -73,8 +73,8 @@ def distance_completely_vectorized(positions, boxsize):
 
     L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
 
-    monstermatrix =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
-    return monstermatrix
+    direction_vector =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
+    return direction_vector
 
 def generate_lattice(particles_per_axis, boxsize):
     return np.mgrid.__getitem__([
@@ -82,12 +82,13 @@ def generate_lattice(particles_per_axis, boxsize):
     ])
         
         
-def U(r, sigma, epsilon):
+def U(r,  sigma=119.8, epsilon=3.405):
     return 4 * epsilon * (sigma**12 /np.power(r, 12) - sigma**6 / np.power(r, 6))
 
 
-def F(direction, r, sigma, epsilon):
+def absolute_force(r,  sigma=119.8, epsilon=3.405):
     """
     F = 1/r * dU/dr * vec{x}
     """
-    return - 24 * (sigma ** 6) * epsilon * np.divide(np.power(r,6) - 2*sigma**6, np.power(r, 14)) * direction
+    
+    return - ( 24 * (sigma ** 6) * epsilon * np.divide(np.power(r,6) - 2*sigma**6, np.power(r, 14)))

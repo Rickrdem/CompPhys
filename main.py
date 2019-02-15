@@ -6,8 +6,10 @@ import pyglet
 from gamestate import Gamestate
 from viewport import Viewport
 
-N = 60 # Number of particles
+N = 3 # Number of particles
 L = 1 # Box size
+h = 40 # Timestep (s) 
+m = 1 # Mass (set to unity)
 pos = np.random.uniform(0, L, size=(N, 2))
 
 def main(): 
@@ -15,7 +17,7 @@ def main():
 
 
 if __name__ == '__main__':
-    game = Gamestate(100)
+    game = Gamestate(1000)
     window = Viewport(game)
 
     window.set_size(1280 * 2 // 3, 720 * 2 // 3)
@@ -38,3 +40,55 @@ if __name__ == '__main__':
     #
     # print(result)
 
+    
+    
+    L = 1 #Box size
+    dim = 2
+    h = 0.1 # Timestep (s) 
+    m = 1 # Mass (set to unity)
+    pos = np.random.uniform(0, L, size=(N, dim))
+    
+    direction_vector = func.distance_completely_vectorized(pos, dim*[L])
+    
+    distance = np.sqrt(np.sum(np.square(direction_vector), axis=2))
+    
+    
+    force = func.absolute_force(distance, sigma = 0.1, epsilon = 0.1)
+    force[force==np.inf] = 0
+    
+    
+    force_vector = direction_vector * force[:,:,np.newaxis] 
+    total_force = np.sum(force_vector, axis = 1)
+
+    x_n = pos
+    v_n = 0
+    
+    x_n_plus_1 = x_n + v_n * h 
+    v_n_plus_1 = v_n + 1 / m * force_vector * h
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
