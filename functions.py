@@ -62,7 +62,7 @@ def distance_vector(positions):
 
 def distance_completely_vectorized(positions, boxsize):
     """
-    L = [0,0,0],[1,0,0],[-1,0,0],[0,1,0],
+    Calculates the distance vectors r_ij for every particle i to every particle j
 
     :param positions:
     :param boxsize:
@@ -74,9 +74,9 @@ def distance_completely_vectorized(positions, boxsize):
     L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
 
     monstermatrix =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
+    return monstermatri
 
-    return np.sqrt(
-        np.sum(
-            np.square(monstermatrix)
-        , axis=2)
-    )
+def generate_lattice(particles_per_axis, dimensions):
+    return np.mgrid.__getitem__([
+        slice(-i,i,particles_per_axis*1j) for i in boxsize
+    ])
