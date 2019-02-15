@@ -1,5 +1,6 @@
 import numpy as np
 #import numba
+from itertools import permutations
 
 
 #@numba.njit(fastmath=True, parallel=True, debug=False)
@@ -57,3 +58,25 @@ def distance_vector(positions):
     dx = x[:,np.newaxis]-x[:,np.newaxis].T
     dy = y[:,np.newaxis]-y[:,np.newaxis].T
     return np.sqrt(np.square(dx)+np.square(dy))
+
+
+def distance_completely_vectorized(positions, boxsize):
+    """
+    L = [0,0,0],[1,0,0],[-1,0,0],[0,1,0],
+
+    :param positions:
+    :param boxsize:
+    :param dimensions:
+    :return:
+    """
+    dimensions = len(boxsize)
+
+    L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
+
+    monstermatrix =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
+
+    return np.sqrt(
+        np.sum(
+            np.square(monstermatrix)
+        , axis=2)
+    )
