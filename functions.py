@@ -80,3 +80,14 @@ def generate_lattice(particles_per_axis, dimensions):
     return np.mgrid.__getitem__([
         slice(-i,i,particles_per_axis*1j) for i in boxsize
     ])
+        
+        
+def U(r, sigma, epsilon):
+    return 4 * epsilon * (sigma**12 /np.power(r, 12) - sigma**6 / np.power(r, 6))
+
+
+def F(direction, r, sigma, epsilon):
+    """
+    F = 1/r * dU/dr * vec{x}
+    """
+    return - 24 * (sigma ** 6) * epsilon * np.divide(np.power(r,6) - 2*sigma**6, np.power(r, 14)) * direction
