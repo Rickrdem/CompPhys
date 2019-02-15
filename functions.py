@@ -76,7 +76,7 @@ def distance_completely_vectorized(positions, boxsize):
     monstermatrix =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
     return monstermatrix
 
-def generate_lattice(particles_per_axis, dimensions):
+def generate_lattice(particles_per_axis, boxsize):
     return np.mgrid.__getitem__([
         slice(-i,i,particles_per_axis*1j) for i in boxsize
     ])
