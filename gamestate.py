@@ -33,7 +33,7 @@ class Gamestate():
         Moves all the particles around
         :return:
         """
-        self.positions = self.positions + self.velocities  #Move particles around
+        self.positions += self.velocities  #Move particles around
 
         dim = self.dimensions
         L = self.size[0]
@@ -45,7 +45,7 @@ class Gamestate():
         distance = np.sqrt(np.sum(np.square(direction_vector), axis=2))
         
         
-        force = func.absolute_force(distance, sigma = 0.1, epsilon = 1000)
+        force = func.absolute_force(distance, sigma = 1, epsilon = 1000)
         force[force==np.inf] = 0
         
         
@@ -60,6 +60,7 @@ class Gamestate():
         self.positions = x_n_plus_1
         self.velocities = v_n_plus_1
 
-        self.positions[:, 0] %= self.size[0]  #Modulo the size of the space
-        self.positions[:, 1] %= self.size[1]
+        # self.positions[:, 0] %= self.size[0]  #Modulo the size of the space
+        # self.positions[:, 1] %= self.size[1]
+        self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]
 
