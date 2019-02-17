@@ -4,7 +4,7 @@ import functions as func
 
 import pyglet
 from gamestate import Gamestate
-from viewport import Viewport
+from viewport import Viewport, setup
 
 N = 3 # Number of particles
 L = 1 # Box size
@@ -17,12 +17,15 @@ def main():
 
 
 if __name__ == '__main__':
-    game = Gamestate(1000)
+    game = Gamestate(400, size=(300,300,300))
+    print('Game created')
     window = Viewport(game)
-
+    print('Windows created')
     window.set_size(1280 * 2 // 3, 720 * 2 // 3)
 
     pyglet.clock.schedule(game.update)
+    print('Starting app')
+    setup()
     pyglet.app.run()
 
     pyglet.clock.unschedule(game.update)
