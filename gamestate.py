@@ -8,10 +8,11 @@ class Gamestate():
         """
 #        self.positions = np.random.randn(self.particles, self.dimensions) + np.array(self.size)/2
 #        self.velocities = np.random.randn(self.particles, self.dimensions)
-        L = 300 #Box size
-        dim = 2
-        N = 400
-        self.positions = np.random.uniform(0,L, size=(N, dim))# + np.array(self.size)/2
+        L = self.size[0] #Box size
+        dim = self.dimensions
+        N = self.particles
+
+        self.positions = np.random.uniform(0, L, size=(N, dim))# + np.array(self.size)/2
 #        self.positions = np.random.uniform(0, L, size=(N, dim))
         self.velocities = np.zeros(shape=(N, dim))
         
@@ -21,7 +22,7 @@ class Gamestate():
         self.particles = particles
         self.size = size
         # self.dimensions = dimensions
-        self.dimensions = 2
+        self.dimensions = len(size)
         self.drawevery = drawevery
 
         self.generate_state()
@@ -34,8 +35,8 @@ class Gamestate():
         """
         self.positions = self.positions + self.velocities  #Move particles around
 
-        dim = 2
-        L = 300
+        dim = self.dimensions
+        L = self.size[0]
         h = 0.0001 # Timestep (s) 
         m = 0.001 # Mass (set to unity)
         
