@@ -91,4 +91,4 @@ def absolute_force(r,  sigma=119.8, epsilon=3.405):
     F = 1/r * dU/dr * vec{x}
     """
     
-    return - ( 24 * (sigma ** 6) * epsilon * np.divide(np.power(r,6) - 2*sigma**6, np.power(r, 14)))
+    return - ( 24 * (sigma ** 6) * epsilon * np.divide(np.power(r,6) - 2*sigma**6, np.power(r, 14), out=np.zeros_like(r), where=r!=0))
