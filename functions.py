@@ -88,7 +88,31 @@ def U(r,  sigma=119.8, epsilon=3.405):
 
 def absolute_force(r,  sigma=119.8, epsilon=3.405):
     """
-    F = 1/r * dU/dr * vec{x}
+    F = - 1/r * dU/dr * vec{x}
     """
-    
     return - ( 24 * (sigma ** 6) * epsilon * np.divide(np.power(r,6) - 2*sigma**6, np.power(r, 14), out=np.zeros_like(r), where=r!=0))
+
+def absolute_force_reduced(r):
+    """
+    F = - 1/r * dU/dr * vec{x}
+    """
+    return - ( 24 * (np.divide(1, np.power(r,13), out=np.zeros_like(r), where=r!=0)) - (np.divide(1, np.power(r,7), out=np.zeros_like(r), where=r!=0)))
+
+
+def verlet_position(x, v, F):
+    x += h * v + h**2 / 2 * F
+    return x
+    
+    
+def verlet_velocity(x, v, F):
+    a1 = x
+    #a2= dostep (x,v,F, t)
+    v += h / 2 * F(a2) + 1
+    return v
+    
+    
+    
+    
+    
+    
+    

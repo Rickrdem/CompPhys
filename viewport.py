@@ -11,7 +11,7 @@ class Viewport(pyglet.window.Window):
         super().__init__()
         self.gamestate = gamestate
         self.fpsdisplay = pyglet.window.FPSDisplay(self)
-
+        
         self.rotation = [1, 0]
         self.colors = None
 
@@ -48,7 +48,7 @@ class Viewport(pyglet.window.Window):
         # positions = gamestate.positions - np.asarray(gamestate.size)/2
         positions = (gamestate.positions - np.asarray(gamestate.size) / 2) / np.asarray(gamestate.size)[np.newaxis,:]
         verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
-        print(verts)
+#        print(verts)
         verts = verts/ 100  # Scaling down size of ico. Should probably be scaled down to ~sigma
         verts_per_shape = len(verts)
 
@@ -76,11 +76,10 @@ class Viewport(pyglet.window.Window):
         label = pyglet.text.Label('States per second: {:.2f}'.format(pyglet.clock.get_fps() * self.gamestate.drawevery),
                                   font_name='Times New Roman',
                                   font_size=12,
-                                  x=10, y=15,
+                                  x=10, y=17,
                                   anchor_x='left', anchor_y='top',
-                                  color=(0, 0, 0, 255))
+                                  color=(255, 255, 255, 255))
         label.draw()
-
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         # if buttons & self.mouse.LEFT:
@@ -132,7 +131,8 @@ def setup():
     """ Basic OpenGL configuration.
     """
     # Set the color of "clear", i.e. the sky, in rgba.
-    gl.glClearColor(0.5, 0.69, 1.0, 1)
+#    gl.glClearColor(0.5, 0.69, 1.0, 1)
+    gl.glClearColor(0, 0, 0, 255)
     # Enable culling (not rendering) of back-facing facets -- facets that aren't
     # visible to you.
     gl.glEnable(gl.GL_CULL_FACE)

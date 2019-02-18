@@ -1,23 +1,24 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import functions as func
 
 import pyglet
 from gamestate import Gamestate
 from viewport import Viewport, setup
 
-N = 3 # Number of particles
-L = 1 # Box size
-h = 40 # Timestep (s) 
-m = 1 # Mass (set to unity)
-pos = np.random.uniform(0, L, size=(N, 2))
+sigma = 3.508*10**(-10)  # meter
+epsilon_over_kB = 119.8 # Kelvin
 
-def main(): 
-    distances = func.distance(pos, size=(L,L))
+N = 2 # Number of particles
+L = 50 # Box size; in units of sigma
+h = 0.001 # Timestep (s) 
+m = 1 # Mass (set to unity)
+dim = 2
+pos = np.random.uniform(0, L, size=(N, dim))
 
 
 if __name__ == '__main__':
-    game = Gamestate(400, size=(300,300,300))
+    L = 43
+    game = Gamestate(particles=100, size=(L,L,L))
     print('Game created')
     window = Viewport(game)
     print('Windows created')
@@ -31,33 +32,13 @@ if __name__ == '__main__':
     pyglet.clock.unschedule(game.update)
     print('done')
 
-    # result = func.distance(pos, size=(L,L))
-    #
-    # x = np.argmin(result[0,:][np.nonzero(result[0,:])])+1
-    # print(x)
-    # plt.scatter(pos[:,0], pos[:,1], color='blue')
-    # plt.scatter(pos[0,0], pos[0,1], color='red')
-    # plt.scatter(pos[x,0], pos[x,1], color='green')
-    # plt.xlim((0,L))
-    # plt.ylim((0,L))
-    #
-    # print(result)
-
-    
-    
-    L = 1 #Box size
-    dim = 2
-    h = 0.1 # Timestep (s) 
-    m = 1 # Mass (set to unity)
-    pos = np.random.uniform(0, L, size=(N, dim))
     
     direction_vector = func.distance_completely_vectorized(pos, dim*[L])
     
     distance = np.sqrt(np.sum(np.square(direction_vector), axis=2))
     
     
-    force = func.absolute_force(distance, sigma = 0.1, epsilon = 0.1)
-    force[force==np.inf] = 0
+    force = func.absolute_force(distance, sigma = 1, epsilon = 1000)
     
     
     force_vector = direction_vector * force[:,:,np.newaxis] 

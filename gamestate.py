@@ -18,7 +18,7 @@ class Gamestate():
         
         self.directions = np.angle(self.velocities[:,0]+1j*self.velocities[:,1])
 
-    def __init__(self, particles=2000, size=(300, 300), drawevery=1):
+    def __init__(self, particles=100, size=(300, 300), drawevery=1):
         self.particles = particles
         self.size = size
         # self.dimensions = dimensions
@@ -33,25 +33,24 @@ class Gamestate():
         Moves all the particles around
         :return:
         """
-        self.positions += self.velocities  #Move particles around
 
         dim = self.dimensions
         L = self.size[0]
         h = 0.0001 # Timestep (s) 
-        m = 0.001 # Mass (set to unity)
+        m = 1 # Mass (set to unity)
         
         direction_vector = func.distance_completely_vectorized(self.positions, dim*[L])
         
         distance = np.sqrt(np.sum(np.square(direction_vector), axis=2))
         
         
-        force = func.absolute_force(distance, sigma = 1, epsilon = 1000)
-        force[force==np.inf] = 0
-        
+#        force = func.absolute_force(distance, sigma = 1, epsilon = 1000)
+        force = func.absolute_force_reduced(distance)
+       
         
         force_vector = direction_vector * force[:,:,np.newaxis] # Force of each point on each other point, in each direction
         total_force = np.sum(force_vector, axis = 1) # Total force on each particle (magnitude and direction)
-    
+        print(np.max(total_force))
         
         x_n_plus_1 = self.positions + self.velocities * h 
         v_n_plus_1 = self.velocities + 1 / m * total_force * h
