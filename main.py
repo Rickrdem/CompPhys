@@ -17,7 +17,7 @@ pos = np.random.uniform(0, L, size=(N, dim))
 
 
 if __name__ == '__main__':
-    L = 43
+    L = 10
     game = Gamestate(particles=100, size=(L,L,L))
     print('Game created')
     window = Viewport(game)

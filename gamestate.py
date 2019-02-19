@@ -50,7 +50,7 @@ class Gamestate():
         
         force_vector = direction_vector * force[:,:,np.newaxis] # Force of each point on each other point, in each direction
         total_force = np.sum(force_vector, axis = 1) # Total force on each particle (magnitude and direction)
-        print(np.max(total_force))
+#        print(np.max(total_force))
         
         x_n_plus_1 = self.positions + self.velocities * h 
         v_n_plus_1 = self.velocities + 1 / m * total_force * h
