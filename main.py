@@ -6,8 +6,22 @@ from gamestate import Gamestate
 from viewport import Viewport, setup
 import matplotlib.pyplot as plt
 
+plt.close('all')
+
+def plot_energy():
+#    fig, ax = plt.subplots()
+#    ax.plot(game.MS_velocity)
+#    fig.show()
+#    
+    fig, ax = plt.subplots()
+    ax.plot(game.kinetic_energy[:], c='r', label='$E_{kin}$')
+    ax.plot(game.potential_energy, c='b', label='$E_{pot}$')
+    ax.hlines(y=game.potential_energy[0], xmin=0,xmax=len(game.kinetic_energy))
+    ax.legend()
+    fig.show()
+
 if __name__ == '__main__':
-    L = 11
+    L = 10
     game = Gamestate(particles=40, size=(L,L,L), drawevery=1)
     print('Game created')
     window = Viewport(game)
@@ -20,9 +34,10 @@ if __name__ == '__main__':
     pyglet.app.run()
 
     pyglet.clock.unschedule(game.update)
-    print('done')
 
 
+    plot_energy()
+    
 
 #    for i in range(500):
 #        sigma = 3.508*10**(-10)  # meter
@@ -62,6 +77,7 @@ if __name__ == '__main__':
 #    plt.xlim((0,5))
 #    plt.ylim(-15,10)
     
+
     
     
     
@@ -82,7 +98,5 @@ if __name__ == '__main__':
     
     
     
-    
-    
-    
-    
+    print("Done!")    
+

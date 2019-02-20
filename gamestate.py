@@ -1,4 +1,5 @@
 import numpy as np
+from itertools import product
 import functions as func
 
 class Gamestate():
@@ -13,7 +14,6 @@ class Gamestate():
         N = self.particles
 
         self.positions = np.random.uniform(0, L, size=(N, dim))# + np.array(self.size)/2
-#        self.positions = np.random.uniform(0, L, size=(N, dim))
         self.velocities = np.zeros(shape=(N, dim))
         
         self.directions = np.angle(self.velocities[:,0]+1j*self.velocities[:,1])
@@ -24,7 +24,10 @@ class Gamestate():
         # self.dimensions = dimensions
         self.dimensions = len(size)
         self.drawevery = drawevery
-
+        self.MS_velocity = []
+        self.potential_energy = []
+        self.kinetic_energy = []
+        
         self.generate_state()
 
     def update(self, a):
@@ -59,6 +62,12 @@ class Gamestate():
         self.positions = x_n_plus_1
         self.velocities = v_n_plus_1
 
+        mean_square_velocity = np.sqrt(np.sum(np.square(self.velocities)))
+        self.MS_velocity.append(mean_square_velocity)
+        self.kinetic_energy.append(1/2 * self.particles * m * mean_square_velocity ** 2)  # T = 1/2 N*m*<v>^2
+        self.potential_energy.append(np.sum(func.U_reduced(distance)))
+        
+        
         # self.positions[:, 0] %= self.size[0]  #Modulo the size of the space
         # self.positions[:, 1] %= self.size[1]
         self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]

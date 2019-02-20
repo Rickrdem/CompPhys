@@ -111,7 +111,7 @@ class Viewport(pyglet.window.Window):
         # set perspective transformation to unity
         gl.glMatrixMode(gl.GL_PROJECTION)
         gl.glLoadIdentity()
-        glu.gluPerspective(70.0, width / float(height), 1, 50)
+        glu.gluPerspective(45.0, width / float(height), 1, 50)
 
         gl.glTranslatef(0,0,-2)
 

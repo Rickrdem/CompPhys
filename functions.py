@@ -1,6 +1,6 @@
 import numpy as np
 #import numba
-from itertools import permutations
+from itertools import product
 
 
 #@numba.njit(fastmath=True, parallel=True, debug=False)
@@ -74,9 +74,16 @@ def distance_completely_vectorized(positions, boxsize):
 
 def generate_lattice(particles_per_axis, boxsize):
     return np.mgrid.__getitem__([
-        slice(-i,i,particles_per_axis*1j) for i in boxsize
+        slice(1,i-1,particles_per_axis*1j) for i in boxsize
     ])
-        
+
+def sc_lattice(boxsize, dim=3):
+    """Returns a simple cubic lattice with  lattice constant 1 (=1*sigma).
+    Points are  0.5*sigma away from the boundary.
+    Retuns for dim=3: nparray([[x1,y1,z1],[x2,y2,z2],...,[xN,yN,zN]]), where 
+    N is the number of nodes.
+    """
+    return np.array(list(product(np.arange(0.5, boxsize, 1), repeat=dim)))        
         
 def U(r,  sigma=119.8, epsilon=3.405):
     return 4 * epsilon * (sigma**12 /np.power(r, 12) - sigma**6 / np.power(r, 6))
