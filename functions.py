@@ -64,10 +64,6 @@ def distance_completely_vectorized(positions, boxsize):
     """
     Calculates the distance vectors r_ij for every particle i to every particle j
 
-    :param positions:
-    :param boxsize:
-    :param dimensions:
-    :return:
     """
     dimensions = len(boxsize)
 
@@ -85,6 +81,8 @@ def generate_lattice(particles_per_axis, boxsize):
 def U(r,  sigma=119.8, epsilon=3.405):
     return 4 * epsilon * (sigma**12 /np.power(r, 12) - sigma**6 / np.power(r, 6))
 
+def U_reduced(r):
+    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0)) 
 
 def absolute_force(r,  sigma=119.8, epsilon=3.405):
     """
@@ -96,7 +94,7 @@ def absolute_force_reduced(r):
     """
     F = - 1/r * dU/dr * vec{x}
     """
-    return  ( 24 * (np.divide(1, np.power(r,13), out=np.zeros_like(r), where=r!=0)) - (np.divide(1, np.power(r,7), out=np.zeros_like(r), where=r!=0)))
+    return  ( 24 *( (np.divide(12, np.power(r,13), out=np.zeros_like(r), where=r!=0)) - (np.divide(6, np.power(r,7), out=np.zeros_like(r), where=r!=0))))
 
 
 def verlet_position(x, v, F):
