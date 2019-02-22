@@ -1,9 +1,9 @@
 import pyglet
-# import pyglet.glu as glu
+# import pyglet.glu.glu as glu.glu
 # import pyglet.gl as gl
 import numpy as np
-from pyglet.gl import *
-from pyglet.glu import *
+from pyglet.gl.gl import *
+from pyglet.gl.glu import *
 
 from itertools import cycle
 
