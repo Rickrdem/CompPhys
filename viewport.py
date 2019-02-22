@@ -1,5 +1,5 @@
 import pyglet
-# import pyglet.glu as glu
+# import pyglet.glu.glu as glu.glu
 # import pyglet.gl as gl
 import numpy as np
 from pyglet.gl.gl import *
