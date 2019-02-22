@@ -11,7 +11,7 @@ from itertools import cycle
 class Viewport(pyglet.window.Window):
     def __init__(self, gamestate=None):
         assert gamestate is not None
-        super().__init__(resizable=True)
+        super().__init__(resizable=True, vsync=False)
 
         self.gamestate = gamestate
         self.fpsdisplay = pyglet.window.FPSDisplay(self)
@@ -49,12 +49,9 @@ class Viewport(pyglet.window.Window):
 
     def particles_to_batch(self):
         gamestate = self.gamestate
-        # print(gamestate.positions.shape, gamestate.size)
-
-        # positions = gamestate.positions - np.asarray(gamestate.size)/2
         positions = (gamestate.positions - np.asarray(gamestate.size) / 2) / np.asarray(gamestate.size)[np.newaxis, :]
         
-        verts, faces = cube()  # The vertices and faces of a single icosahedron
+        verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
 
         verts = verts / 100  # Scaling down size of ico. Should probably be scaled down to ~sigma
 
@@ -62,26 +59,28 @@ class Viewport(pyglet.window.Window):
         faces_per_shape = len(faces)
 
         particles = gamestate.particles
-        print(particles)
         dimensions = gamestate.dimensions
 
         verts = np.tile(verts.T, particles).T  # create vertices for all particles
-        verts[:, :min(3, dimensions)] += positions.repeat(verts_per_shape).reshape(dimensions, -1).T
+        verts[:, :min(3, dimensions)] += positions.repeat(verts_per_shape, axis=0)
 
-        faces = (faces.flatten()[:, np.newaxis] + faces_per_shape * (1+np.arange(particles))).T.flatten()
-        faces = faces.flatten()
-        
-        print(verts.size, faces.size)
+        faces = (faces.flatten()[:, np.newaxis] + verts_per_shape * (np.arange(particles))).T
         
         if self.colors is None:
             self.colors = (verts.T/np.sum(verts, axis=1)).T
         spheres = self.batch.add_indexed(
             len(verts),
-            GL_QUADS,
+            GL_TRIANGLES,
             None,
-            faces,
+            faces.flatten(),
             ('v3f', verts.flatten()),
             ('c3f', self.colors.flatten())
+        )
+        points = self.batch.add(
+            len(verts),
+            GL_POINTS,
+            None,
+            ('v3f', verts.flatten())
         )
 
     def draw_fps(self):
