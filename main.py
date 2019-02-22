@@ -21,8 +21,10 @@ def plot_energy():
     fig.show()
 
 if __name__ == '__main__':
+
     L = 10
     game = Gamestate(particles=40, size=(L,L,L), drawevery=1)
+
     print('Game created')
     window = Viewport(game)
     print('Windows created')
@@ -35,9 +37,8 @@ if __name__ == '__main__':
 
     pyglet.clock.unschedule(game.update)
 
-
     plot_energy()
-    
+
 
 #    for i in range(500):
 #        sigma = 3.508*10**(-10)  # meter

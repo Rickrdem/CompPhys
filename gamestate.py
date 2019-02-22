@@ -46,10 +46,10 @@ class Gamestate():
         
         distance = np.sqrt(np.sum(np.square(direction_vector), axis=2))
         
-        
+
 #        force = func.absolute_force(distance, sigma = 1, epsilon = 1000)
         force = func.absolute_force_reduced(distance)
-       
+
         
         force_vector = direction_vector * force[:,:,np.newaxis] # Force of each point on each other point, in each direction
         total_force = np.sum(force_vector, axis = 1) # Total force on each particle (magnitude and direction)
