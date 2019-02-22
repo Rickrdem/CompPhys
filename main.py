@@ -9,24 +9,23 @@ import matplotlib.pyplot as plt
 plt.close('all')
 
 def plot_energy():
-#    fig, ax = plt.subplots()
-#    ax.plot(game.MS_velocity)
-#    fig.show()
-#    
     fig, ax = plt.subplots()
-    ax.plot(game.kinetic_energy[:], c='r', label='$E_{kin}$')
-    ax.plot(game.potential_energy, c='b', label='$E_{pot}$')
-    ax.plot(np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='H')
+    time = np.arange(0, game.h*len(game.kinetic_energy), game.h)
+    ax.plot(time, 2*np.array(game.kinetic_energy[:]),c='r', label='$E_{kin}$')
+    ax.plot(time, game.potential_energy, c='b', label='$E_{pot}$')
+    ax.plot(time, 2*np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='H')
+    ax.set_xlabel("Time ($(m\sigma^2/\epsilon)^{1/2}$)")
+    ax.set_ylabel("Energy ($1/\epsilon$)")
     ax.legend()
+    fig.tight_layout()
     fig.show()
 
 if __name__ == '__main__':
-
-    L = 10
-    game = Gamestate(particles=8, size=(L,L,L), h=0.005)
+    L = 3.
+    game = Gamestate(particles=108, h=0.0001, size=(L,L,L))
 
     print('Game created')
-    window = Viewport(game, drawevery=10)
+    window = Viewport(game, drawevery=1000)
     print('Windows created')
     window.set_size(1280 * 2//3, 720 * 2//3)
 
@@ -37,11 +36,9 @@ if __name__ == '__main__':
 
     pyglet.clock.unschedule(game.update)
     
-    print(game.positions)
-
     plot_energy()
 
-
+    
 #    for i in range(500):
 #        sigma = 3.508*10**(-10)  # meter
 #        epsilon_over_kB = 119.8 # Kelvin
