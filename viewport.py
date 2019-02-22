@@ -9,9 +9,11 @@ from itertools import cycle
 
 
 class Viewport(pyglet.window.Window):
-    def __init__(self, gamestate=None):
+    def __init__(self, gamestate=None, drawevery=1):
         assert gamestate is not None
         super().__init__(resizable=True, vsync=False)
+
+        self.drawevery = drawevery
 
         self.gamestate = gamestate
         self.fpsdisplay = pyglet.window.FPSDisplay(self)
@@ -20,6 +22,8 @@ class Viewport(pyglet.window.Window):
         self.colors = None
 
     def on_draw(self):
+        for i in range(self.drawevery-1):
+            self.gamestate.update(0)  # calculate self.drawevery-1 extra states before rendering
         self.clear()
         self.batch = pyglet.graphics.Batch()
         self.set_3d()
@@ -53,7 +57,7 @@ class Viewport(pyglet.window.Window):
         
         verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
 
-        verts = verts / 100  # Scaling down size of ico. Should probably be scaled down to ~sigma
+        verts = verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
 
         verts_per_shape = len(verts)
         faces_per_shape = len(faces)
@@ -84,7 +88,7 @@ class Viewport(pyglet.window.Window):
         )
 
     def draw_fps(self):
-        label = pyglet.text.Label('States per second: {:.2f}'.format(pyglet.clock.get_fps() * self.gamestate.drawevery),
+        label = pyglet.text.Label('States per second: {:.2f}'.format(pyglet.clock.get_fps() * self.drawevery),
                                   font_name='Times New Roman',
                                   font_size=12,
                                   x=10, y=17,
@@ -229,6 +233,7 @@ def icosahedron():
         [-t, 0, -1],
         [-t, 0, 1]
     ])
+    vertices /= (np.sqrt(t**2+1))  # unit size
 
     faces = np.asarray([
         [0, 11, 5],

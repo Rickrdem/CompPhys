@@ -22,13 +22,13 @@ def plot_energy():
 
 if __name__ == '__main__':
 
-    L = 2
-    game = Gamestate(particles=8, size=(L,L,L), drawevery=1, h=0)
+    L = 10
+    game = Gamestate(particles=8, size=(L,L,L), h=0.005)
 
     print('Game created')
-    window = Viewport(game)
+    window = Viewport(game, drawevery=10)
     print('Windows created')
-    window.set_size(1280 * 2, 720 * 2)
+    window.set_size(1280 * 2//3, 720 * 2//3)
 
     pyglet.clock.schedule(game.update)
     print('Starting app')

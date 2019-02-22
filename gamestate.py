@@ -14,20 +14,19 @@ class Gamestate():
         N = self.particles
 
         self.positions = np.random.uniform(0, L, size=(N, dim))# + np.array(self.size)/2
-        self.positions = func.sc_lattice(L)
+        # self.positions = func.sc_lattice(L)
         self.velocities = np.zeros(shape=(N, dim))
         self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]
         
 #        self.directions = np.angle(self.velocities[:,0]+1j*self.velocities[:,1])
 
-    def __init__(self, particles=100, h=0.001, size=(300, 300), drawevery=1, dtype=np.float32):
+    def __init__(self, particles=100, h=0.001, size=(300, 300), dtype=np.float32):
         self.particles = particles
         self.size = size
         self.dimensions = len(size)
         self.h = h
         self.m = 1
-        
-        self.drawevery = drawevery
+
         self.dtype = dtype
         
         self.positions = np.zeros([particles,self.dimensions], dtype=dtype)
@@ -53,8 +52,9 @@ class Gamestate():
         
         self.distances_update()
         self.forces_update()
-        self.positions_update()
         self.velocities_update()
+        self.positions_update()
+
         
 #        direction_vector = func.distance_completely_vectorized(self.positions, dim*[L])
         
