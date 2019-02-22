@@ -16,19 +16,19 @@ def plot_energy():
     fig, ax = plt.subplots()
     ax.plot(game.kinetic_energy[:], c='r', label='$E_{kin}$')
     ax.plot(game.potential_energy, c='b', label='$E_{pot}$')
-    ax.hlines(y=game.potential_energy[0], xmin=0,xmax=len(game.kinetic_energy))
+    ax.plot(np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='H')
     ax.legend()
     fig.show()
 
 if __name__ == '__main__':
 
-    L = 10
-    game = Gamestate(particles=40, size=(L,L,L), drawevery=1)
+    L = 2
+    game = Gamestate(particles=8, size=(L,L,L), drawevery=1, h=0)
 
     print('Game created')
     window = Viewport(game)
     print('Windows created')
-    window.set_size(1280 * 2 // 3, 720 * 2 // 3)
+    window.set_size(1280 * 2, 720 * 2)
 
     pyglet.clock.schedule(game.update)
     print('Starting app')
@@ -36,6 +36,8 @@ if __name__ == '__main__':
     pyglet.app.run()
 
     pyglet.clock.unschedule(game.update)
+    
+    print(game.positions)
 
     plot_energy()
 

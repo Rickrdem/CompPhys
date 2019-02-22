@@ -2,8 +2,8 @@ import pyglet
 # import pyglet.glu as glu
 # import pyglet.gl as gl
 import numpy as np
-from pyglet.gl import *
-from pyglet.glu import *
+from pyglet.gl.gl import *
+from pyglet.gl.glu import *
 
 from itertools import cycle
 
@@ -53,26 +53,31 @@ class Viewport(pyglet.window.Window):
 
         # positions = gamestate.positions - np.asarray(gamestate.size)/2
         positions = (gamestate.positions - np.asarray(gamestate.size) / 2) / np.asarray(gamestate.size)[np.newaxis, :]
-        verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
+        
+        verts, faces = cube()  # The vertices and faces of a single icosahedron
 
         verts = verts / 100  # Scaling down size of ico. Should probably be scaled down to ~sigma
 
         verts_per_shape = len(verts)
+        faces_per_shape = len(faces)
 
         particles = gamestate.particles
+        print(particles)
         dimensions = gamestate.dimensions
 
         verts = np.tile(verts.T, particles).T  # create vertices for all particles
         verts[:, :min(3, dimensions)] += positions.repeat(verts_per_shape).reshape(dimensions, -1).T
 
-        faces = (faces.flatten()[:, np.newaxis] + verts_per_shape * np.arange(particles)).T.flatten()
+        faces = (faces.flatten()[:, np.newaxis] + faces_per_shape * (1+np.arange(particles))).T.flatten()
         faces = faces.flatten()
-
+        
+        print(verts.size, faces.size)
+        
         if self.colors is None:
             self.colors = (verts.T/np.sum(verts, axis=1)).T
         spheres = self.batch.add_indexed(
             len(verts),
-            GL_TRIANGLES,
+            GL_QUADS,
             None,
             faces,
             ('v3f', verts.flatten()),

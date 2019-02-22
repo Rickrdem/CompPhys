@@ -65,12 +65,19 @@ def distance_completely_vectorized(positions, boxsize):
     Calculates the distance vectors r_ij for every particle i to every particle j
 
     """
-    dimensions = len(boxsize)
-
     L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
 
     direction_vector =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
     return direction_vector
+
+def distance_matrix(positions, boxsize):
+    L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
+
+    distances =  np.sqrt(np.sum(np.square(
+                                (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2)
+                                , axis=2)
+                        )
+    return distances
 
 def generate_lattice(particles_per_axis, boxsize):
     return np.mgrid.__getitem__([
@@ -101,10 +108,10 @@ def absolute_force_reduced(r):
     """
     F = - 1/r * dU/dr * vec{x}
     """
-    return  ( 24 *( (np.divide(12, np.power(r,13), out=np.zeros_like(r), where=r!=0)) - (np.divide(6, np.power(r,7), out=np.zeros_like(r), where=r!=0))))
+    return  ( 24 *( (np.divide(2, np.power(r,13), out=np.zeros_like(r), where=r!=0)) - (np.divide(1, np.power(r,7), out=np.zeros_like(r), where=r!=0))))
 
 
-def verlet_position(x, v, F):
+def verlet_position(x, v, F, h):
     x += h * v + h**2 / 2 * F
     return x
     
