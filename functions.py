@@ -129,8 +129,10 @@ def absolute_force_reduced(r):
     """
     return  ( 24 *( (np.divide(2, np.power(r,14), out=np.zeros_like(r), where=r!=0)) - (np.divide(1, np.power(r,8), out=np.zeros_like(r), where=r!=0))))
     
-    
-    
+def force_reduced(r):
+    """Calculate the vectorised force matrix using the distances between all particles r"""
+    return (24 * ((np.divide(2, np.power(r, 13), out=np.zeros_like(r), where=r != 0)) - (
+        np.divide(1, np.power(r, 7), out=np.zeros_like(r), where=r != 0))))
     
     
     
