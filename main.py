@@ -21,13 +21,13 @@ def plot_energy():
     fig.show()
 
 if __name__ == '__main__':
-    L = 50
-    game = Gamestate(particles=12, h=0.01, size=(L,L,L))
+    L = 7
+    game = Gamestate(particles=12, h=0.0001, size=(L,L,L))
 
     # game.update(1)
 
     print('Game created')
-    window = Viewport(game, drawevery=10)
+    window = Viewport(game, drawevery=200)
     print('Windows created')
     window.set_size(1280 * 2//3, 720 * 2//3)
 

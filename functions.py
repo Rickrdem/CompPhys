@@ -115,7 +115,7 @@ def fcc_lattice(boxsize, a=1, dim=3):
 #    return 4 * epsilon * (sigma**12 /np.power(r, 12) - sigma**6 / np.power(r, 6))
 
 def U_reduced(r):
-    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0)) 
+    return -4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0))
 
 #def absolute_force(r,  sigma=119.8, epsilon=3.405):
 #    """
@@ -127,12 +127,20 @@ def absolute_force_reduced(r):
     """
     F = - 1/r * dU/dr * vec{x}
     """
-    return  ( 24 *( (np.divide(2, np.power(r,14), out=np.zeros_like(r), where=r!=0)) - (np.divide(1, np.power(r,8), out=np.zeros_like(r), where=r!=0))))
+    return  ( 24 *( (np.divide(2, np.power(r,14), out=np.zeros_like(r), where=r!=0)) - (np.divide(2, np.power(r,8), out=np.zeros_like(r), where=r!=0))))
     
 def force_reduced(r):
     """Calculate the vectorised force matrix using the distances between all particles r"""
-    return (24 * ((np.divide(2, np.power(r, 13), out=np.zeros_like(r), where=r != 0)) - (
-        np.divide(1, np.power(r, 7), out=np.zeros_like(r), where=r != 0))))
+    dist = abs(r)
+    direction = np.divide(r, dist[:,:,np.newaxis], out=np.zeros_like(r), where=r != 0)
+    return -direction*24*(2*np.power(dist, -13, out=np.zeros_like(dist), where=dist!=0)
+                          - np.power(dist, -7, out=np.zeros_like(dist), where=dist!=0)
+                          )[:,:,np.newaxis]
+    # return direction*(24 * ((np.divide(2, np.power(dist, 13), out=np.zeros_like(r), where=r != 0)) - (
+    #     np.divide(1, np.power(dist, 7), out=np.zeros_like(r), where=r != 0))))[:,:,np.newaxis]
     
     
-    
+def abs(r):
+    """Return the magnitude of the vectors contained in r"""
+    return np.sqrt(np.sum(np.square(r), axis=2))
+
