@@ -68,7 +68,7 @@ def distance_completely_vectorized(positions, boxsize):
     """
     L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
     L=boxsize[0]
-    direction_vector =  (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L-L/2 # N,N,di
+    direction_vector = (positions[:,np.newaxis,:] - positions[np.newaxis,:,:] - L/2)%L + L/2
     return direction_vector
 
 def distance_matrix(positions, boxsize):
@@ -98,16 +98,16 @@ def fcc_lattice(boxsize, a=1, dim=3):
     sc1 = np.array(list(product(np.arange(a/2, boxsize, a), repeat=dim)))
 
     sc2 = np.array(list(product(np.arange(a/2, boxsize, a), repeat=dim)))
-    sc2[:,0] += .5
-    sc2[:,1] += .5
+    sc2[:,0] += .5*a
+    sc2[:,1] += .5*a
 
     sc3 = np.array(list(product(np.arange(a/2, boxsize, a), repeat=dim)))
-    sc3[:,0] += .5
-    sc3[:,2] += .5
+    sc3[:,0] += .5*a
+    sc3[:,2] += .5*a
 
     sc4 = np.array(list(product(np.arange(a/2, boxsize, a), repeat=dim)))
-    sc4[:,1] += .5
-    sc4[:,2] += .5
+    sc4[:,1] += .5*a
+    sc4[:,2] += .5*a
     return np.concatenate((sc1, sc2, sc3, sc4))
 
 
@@ -142,5 +142,5 @@ def force_reduced(r):
     
 def abs(r):
     """Return the magnitude of the vectors contained in r"""
-    return np.sqrt(np.sum(np.square(r), axis=2))
+    return np.sqrt(np.sum(np.square(r), axis=-1))
 
