@@ -127,10 +127,10 @@ class Viewport(pyglet.window.Window):
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(60.0, width / float(height), 1, 50)
+        gluPerspective(75.0, width / float(height), 0.1, 3)
 
 
-        glTranslatef(0, 0, -2)
+        glTranslatef(0, 0, -1.1)
 
         # set modelview rotation
         glMatrixMode(GL_MODELVIEW)
