@@ -11,23 +11,25 @@ plt.close('all')
 def plot_energy():
     fig, ax = plt.subplots()
     time = np.arange(0, game.h*len(game.kinetic_energy), game.h)
-    ax.plot(time, 2*np.array(game.kinetic_energy[:]),c='r', label='$E_{kin}$')
-    ax.plot(time, game.potential_energy, c='b', label='$E_{pot}$')
-    ax.plot(time, 2*np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='H')
+    # ax.plot(time, 2*np.array(game.kinetic_energy[:]),c='r', label='$E_{kin}$')
+    # ax.plot(time, game.potential_energy, c='b', label='$E_{pot}$')
+    # ax.plot(time, 2*np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='H')
     ax.set_xlabel("Time ($(m\sigma^2/\epsilon)^{1/2}$)")
     ax.set_ylabel("Energy ($1/\epsilon$)")
     ax.legend()
     fig.tight_layout()
     fig.show()
+    plt.hist(func.abs(game.velocities), bins=int(game.particles**0.5))
+    plt.show()
 
 if __name__ == '__main__':
-    L = 7
-    game = Gamestate(particles=12, h=0.0001, size=(L,L,L))
+    L = 5
+    game = Gamestate(particles=500, h=0.001, size=(L,L,L), dtype=np.float64)
 
     # game.update(1)
 
     print('Game created')
-    window = Viewport(game, drawevery=200)
+    window = Viewport(game, drawevery=1)
     print('Windows created')
     window.set_size(1280 * 2//3, 720 * 2//3)
 
@@ -35,6 +37,7 @@ if __name__ == '__main__':
     print('Starting app')
     setup()
     pyglet.app.run()
+    print('Average velocity:', np.sum(func.abs(game.velocities))/game.particles)
 
     pyglet.clock.unschedule(game.update)
     
@@ -79,27 +82,6 @@ if __name__ == '__main__':
 #    plt.plot(x, F_x)    
 #    plt.xlim((0,5))
 #    plt.ylim(-15,10)
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     print("Done!")    
 

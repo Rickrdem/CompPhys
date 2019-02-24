@@ -57,7 +57,7 @@ class Viewport(pyglet.window.Window):
         
         verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
 
-        verts = verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
+        verts = 1/10* verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
 
         verts_per_shape = len(verts)
         faces_per_shape = len(faces)
@@ -80,12 +80,12 @@ class Viewport(pyglet.window.Window):
             ('v3f', verts.flatten()),
             ('c3f', self.colors.flatten())
         )
-        points = self.batch.add(
-            len(verts),
-            GL_POINTS,
-            None,
-            ('v3f', verts.flatten())
-        )
+        # points = self.batch.add(
+        #     len(verts),
+        #     GL_POINTS,
+        #     None,
+        #     ('v3f', verts.flatten())
+        # )
 
     def draw_fps(self):
         label = pyglet.text.Label('States per second: {:.2f}'.format(pyglet.clock.get_fps() * self.drawevery),

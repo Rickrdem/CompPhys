@@ -11,13 +11,13 @@ class Gamestate():
 #        self.positions = np.random.uniform(0, self.size[0], size=(self.particles, self.dimensions))# + np.array(self.size)/2
         verts, faces = icosahedron()
         # self.positions[:] = np.array([[10,10,10],[11,11,11]])
-        self.positions[:] = verts*3 + np.asarray(self.size)/2
+        # self.positions[:] = verts*2# + np.asarray(self.size)/2
         # self.positions[0,0] += 0.0000001
-        # self.positions = func.fcc_lattice(self.size[0], a=1)
-        self.positions += np.random.uniform(-.1, .1, size=(self.particles, self.dimensions))
+        self.positions = func.fcc_lattice(self.size[0], a=1)
+        # self.positions += np.random.uniform(-.1, .1, size=(self.particles, self.dimensions))
 #        self.velocities = np.zeros(shape=(self.particles, self.dimensions))
-#         self.velocities[:] = np.random.normal(0, 0,size=(self.particles,self.dimensions))
-        self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]
+        self.velocities[:] = np.random.normal(0, 0.1,size=(self.particles,self.dimensions))
+#         self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]
         
         # self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) # Missing a factor of 2 ?!
         # self.distances_update()
@@ -56,11 +56,11 @@ class Gamestate():
         :return:
         """
 
-        self.velocities_update()
+        self.velocities_update()  # first half
         self.positions_update()
         self.distances_update()
         self.forces_update()
-        self.velocities_update()  # Not required for physics but required for energy
+        self.velocities_update()  # seconds half
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
 
@@ -80,10 +80,14 @@ class Gamestate():
     def forces_update(self):
         """Update the forces acting on all particles in-place using velocity-verlet"""
         self.forces[:] = np.sum(func.force_reduced(self.distances), axis=1)
+        print('total force',np.sum(self.forces))
     
     def distances_update(self):
         """Update the NxNxD distance matrix with the nearest image convention"""
-        self.distances = func.distance_completely_vectorized(self.positions, self.size)
+        self.distances[:] = func.distance_completely_vectorized(self.positions, self.size)
+        # self.distances += np.transpose(self.distances, axes=(1,0,2))  # explicitly symmetrize
+
+
         
         
 
