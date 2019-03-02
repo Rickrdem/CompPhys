@@ -1,12 +1,7 @@
 import pyglet
-# import pyglet.glu.glu as glu.glu
-# import pyglet.gl as gl
 import numpy as np
 from pyglet.gl.gl import *
 from pyglet.gl.glu import *
-
-from itertools import cycle
-
 
 class Viewport(pyglet.window.Window):
     def __init__(self, gamestate=None, drawevery=1):
@@ -33,7 +28,7 @@ class Viewport(pyglet.window.Window):
 
         self.set_2d()
 
-        self.draw_fps()
+        self.draw_hud()
 
     def draw_bounding_box(self):
         verts, faces = cube()
@@ -85,21 +80,33 @@ class Viewport(pyglet.window.Window):
                 ('c3f', self.colors.flatten())
             )
 
-        # points = self.batch.add(
-        #     len(verts),
-        #     GL_POINTS,
-        #     None,
-        #     ('v3f', verts.flatten())
-        # )
+    def draw_hud(self):
+        text = """
+            Time step size {h}
+            Particles {particles}
+            Boxsize {boxsize}
+            Average velocity {vel:.2f}
+            Temperature {temp:.2f}
+            Pressure {pressure:.2f}
+            FPS {fps:.2f}
+            """.format(h=self.gamestate.h,
+                       particles=self.gamestate.particles,
+                       boxsize=self.gamestate.size,
+                       vel=1,
+                       temp=1,
+                       pressure=1,
+                       fps=pyglet.clock.get_fps() * self.drawevery)
 
-    def draw_fps(self):
-        label = pyglet.text.Label('States per second: {:.2f}'.format(pyglet.clock.get_fps() * self.drawevery),
-                                  font_name='Times New Roman',
-                                  font_size=12,
-                                  x=10, y=17,
-                                  anchor_x='left', anchor_y='top',
-                                  color=(255, 255, 255, 255))
-        label.draw()
+        document = pyglet.text.decode_text(text)
+        document.set_style(0, 0, dict(font_name='Arial', font_size=8))
+
+        width, height = self.get_size()
+
+        layout = pyglet.text.layout.TextLayout(document, width//2, height, multiline=True)
+        layout.x = -30
+        layout.anchor_x = 'left'
+        layout.y = 0
+        layout.draw()
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         # if buttons & self.mouse.LEFT:
@@ -192,36 +199,11 @@ def cube():
         [3, 7, 4, 0],
         [4, 5, 1, 0]
     ])
-
-    # faces = np.array([
-    #     [0,1,2],
-    #     [2,3,0],
-    #
-    #     [3,2,6],
-    #     [6,7,3],
-    #
-    #     [7,6,5],
-    #     [5,4,7],
-    #
-    #     [3,7,4],
-    #     [4,0,3],
-    #
-    #     [6,2,1],
-    #     [1,5,6],
-    #
-    #     [4,5,1],
-    #     [1,0,4]
-    # ])
-
     return vertices, faces
 
 
 def icosahedron():
     t = 1 + np.sqrt(5) / 2
-    # vertices = list(cycle((1, t, 0))) +\
-    #     list(cycle((-1, t, 0))) +\
-    #     list(cycle((1, -t, 0))) +\
-    #     list(cycle((-1, -t, 0)))
     vertices = np.asarray([
         [-1, t, 0],
         [1, t, 0],
