@@ -2,6 +2,7 @@ import pyglet
 import numpy as np
 from pyglet.gl.gl import *
 from pyglet.gl.glu import *
+import pyglet.window.key as key
 
 class Viewport(pyglet.window.Window):
     def __init__(self, gamestate=None, drawevery=1):
@@ -14,6 +15,7 @@ class Viewport(pyglet.window.Window):
         self.fpsdisplay = pyglet.window.FPSDisplay(self)
         
         self.rotation = [1, 0]
+        self.fov = 75.
         self.colors = None
         self.batch = pyglet.graphics.Batch()
 
@@ -88,13 +90,15 @@ class Viewport(pyglet.window.Window):
             Average velocity {vel:.2f}
             Temperature {temp:.2f}
             Pressure {pressure:.2f}
-            FPS {fps:.2f}
+            Draw every {drawevery}
+            States per frame {fps:.2f}
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
                        boxsize=self.gamestate.size,
                        vel=1,
                        temp=1,
                        pressure=1,
+                       drawevery=self.drawevery,
                        fps=pyglet.clock.get_fps() * self.drawevery)
 
         document = pyglet.text.decode_text(text)
@@ -102,17 +106,53 @@ class Viewport(pyglet.window.Window):
 
         width, height = self.get_size()
 
-        layout = pyglet.text.layout.TextLayout(document, width//2, height, multiline=True)
-        layout.x = -30
-        layout.anchor_x = 'left'
-        layout.y = 0
-        layout.draw()
+        meta_information = pyglet.text.layout.TextLayout(document, width//2, height, multiline=True)
+        meta_information.x = -30
+        meta_information.anchor_x = 'left'
+        meta_information.y = 0
+        meta_information.draw()
+
+        text = """
+            Rotate the view by clicking and dragging
+            Scrolling zooms in and out of the view
+            Horizontal arrow keys alters states per frame
+            """
+        document = pyglet.text.decode_text(text)
+        document.set_style(0, 0, dict(font_name='Arial', font_size=8))
+
+        instructions = pyglet.text.layout.TextLayout(document, width, height, multiline=False)
+        instructions.x = -30
+        instructions.y = -height+15
+        instructions.anchor_x = 'left'
+        instructions.anchor_y = 'bottom'
+
+        instructions.draw()
+
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         # if buttons & self.mouse.LEFT:
         x, y = self.rotation
         x, y = x + dx / 5, y + dy / 5
         self.rotation = (x, y)
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol==key.RIGHT:
+            self.drawevery *= 2
+            if self.drawevery >= 1000:
+                self.drawevery = 1000
+        elif symbol==key.LEFT:
+            self.drawevery = self.drawevery//2
+            if self.drawevery <=1:
+                self.drawevery = 1
+        elif symbol==key.V:
+            self.set_vsync(not self.vsync)
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self.fov -= scroll_y
+        if self.fov <= 1:
+            self.fov =1
+        elif self.fov >= 180:
+            self.fov = 180
 
     def set_2d(self):
         """ Configure OpenGL for drawing 2d objects such as the fps-counter
@@ -139,8 +179,7 @@ class Viewport(pyglet.window.Window):
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(75.0, width / float(height), 0.1, 3)
-
+        gluPerspective(self.fov, width / float(height), 0.1, 3)
 
         glTranslatef(0, 0, -1.1)
 
