@@ -20,12 +20,12 @@ class Viewport(pyglet.window.Window):
         
         self.rotation = [1, 0]
         self.colors = None
+        self.batch = pyglet.graphics.Batch()
 
     def on_draw(self):
         for i in range(self.drawevery-1):
             self.gamestate.update(0)  # calculate self.drawevery-1 extra states before rendering
         self.clear()
-        self.batch = pyglet.graphics.Batch()
         self.set_3d()
         self.particles_to_batch()
         self.draw_bounding_box()
@@ -72,14 +72,19 @@ class Viewport(pyglet.window.Window):
         
         if self.colors is None:
             self.colors = (verts.T/np.sum(verts, axis=1)).T
-        spheres = self.batch.add_indexed(
-            len(verts),
-            GL_TRIANGLES,
-            None,
-            faces.flatten(),
-            ('v3f', verts.flatten()),
-            ('c3f', self.colors.flatten())
-        )
+
+        if hasattr(self, 'spheres'):
+            self.spheres.vertices = verts.flatten()
+        else:
+            self.spheres = self.batch.add_indexed(
+                len(verts),
+                GL_TRIANGLES,
+                None,
+                faces.flatten(),
+                ('v3f', verts.flatten()),
+                ('c3f', self.colors.flatten())
+            )
+
         # points = self.batch.add(
         #     len(verts),
         #     GL_POINTS,
