@@ -152,7 +152,7 @@ class Viewport(pyglet.window.Window):
         elif symbol==key.DOWN:
             self.gamestate.T = self.gamestate.T - 0.1
             if self.gamestate.T <=0:
-                self.gamestate.T = 0
+                self.gamestate.T = 0.0000001
         elif symbol==key.V:
             self.set_vsync(not self.vsync)
 

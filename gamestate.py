@@ -76,7 +76,7 @@ class Gamestate():
         Lambda = np.sqrt(((self.particles-1)*self.T*118.9)/(np.sum(self.m*np.square(self.velocities))))
 
 
-        self.distances_in_matrix = func.distance_matrix(self.positions, self.size)
+        self.distances_in_matrix = func.distance_jit(self.positions, self.size)
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
 
