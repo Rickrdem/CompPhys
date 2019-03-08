@@ -186,20 +186,19 @@ def force_jit(r):
     for i in range(particles):
         for k in range(dimensions):
             force[i, i, k] = 0
-        for j in range(1, particles):
-            m = 0  # magnitude of the vector
+        for j in range(i + 1, particles):
+            square = 0  # magnitude of the vector squared
 
             for k in range(dimensions):
-                m += r[i, j, k] * r[i, j, k]
-            m = np.sqrt(m)
+                square += r[i, j, k] * r[i, j, k]
 
             for k in range(dimensions):
-                if m == 0:
+                if square == 0:
                     force[i, j, k] = 0
                 else:
-                    force[i, j, k] = r[i, j, k] / m * 24 * (
-                                2 / (m * m * m * m * m * m * m * m * m * m * m * m * m)  # absolutely ridiculous performance increase
-                                - 1 / (m * m * m * m * m * m * m))
+                    sixth = square ** 3
+                    twelvth = sixth ** 2
+                    force[i, j, k] = r[i, j, k] * 24 * (2 / (twelvth * square) - 1 / (sixth * square))
                 force[j, i, k] = -force[i, j, k]
     return force
     
