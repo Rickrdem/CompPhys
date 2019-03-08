@@ -88,18 +88,20 @@ class Viewport(pyglet.window.Window):
             Particles {particles}
             Boxsize {boxsize}
             Average velocity {vel:.2f}
-            Temperature {temp:.2f}
+            Temperature {temp:.2f} K
             Pressure {pressure:.2f}
             Draw every {drawevery}
             States per frame {fps:.2f}
+            Elapsed time {time:.3f} ns
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
                        boxsize=self.gamestate.size,
                        vel=1,
-                       temp=1,
+                       temp=self.gamestate.T,
                        pressure=1,
                        drawevery=self.drawevery,
-                       fps=pyglet.clock.get_fps() * self.drawevery)
+                       fps=pyglet.clock.get_fps() * self.drawevery,
+                       time=2.15*self.gamestate.time)
 
         document = pyglet.text.decode_text(text)
         document.set_style(0, 0, dict(font_name='Arial', font_size=8))
@@ -116,6 +118,7 @@ class Viewport(pyglet.window.Window):
             Rotate the view by clicking and dragging
             Scrolling zooms in and out of the view
             Horizontal arrow keys alters states per frame
+            Vertical arrow keys alter temperature
             """
         document = pyglet.text.decode_text(text)
         document.set_style(0, 0, dict(font_name='Arial', font_size=8))
@@ -144,6 +147,12 @@ class Viewport(pyglet.window.Window):
             self.drawevery = self.drawevery//2
             if self.drawevery <=1:
                 self.drawevery = 1
+        elif symbol==key.UP:
+            self.gamestate.T = self.gamestate.T + 0.1
+        elif symbol==key.DOWN:
+            self.gamestate.T = self.gamestate.T - 0.1
+            if self.gamestate.T <=0:
+                self.gamestate.T = 0
         elif symbol==key.V:
             self.set_vsync(not self.vsync)
 
