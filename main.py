@@ -19,8 +19,6 @@ def plot_energy():
     ax.legend()
     fig.tight_layout()
     fig.show()
-#    plt.hist(func.abs(game.velocities), bins=int(game.particles**0.5))
-    plt.show()
 
 def plot_velocity_distribution():
     fig, ax = plt.subplots()
@@ -29,7 +27,6 @@ def plot_velocity_distribution():
     ax.set_ylabel("#")
     fig.tight_layout()
     fig.show()
-    plt.show()
 
 def plot_diffusion():
     fig, ax = plt.subplots()
@@ -40,22 +37,19 @@ def plot_diffusion():
     ax.legend()
     fig.tight_layout()
     fig.show()
-    plt.show()
    
 if __name__ == '__main__':
     L = 5
-    lattice_constant = 1.2
+    lattice_constant = 1.3
     state = func.fcc_lattice(L, a=lattice_constant)
 
-    game = Gamestate(state, T=0.3, size=(L,L,L), dtype=np.float64)
-
-    # game.update(1)
+    game = Gamestate(state, T=0.24, size=(L,L,L), dtype=np.float64)
 
     print('Game created')
     window = Viewport(game, drawevery=1)
     print('Windows created')
-    window.set_size(1280 * 2//2, 720 * 2//2)
-
+    window.set_size(1280 * 2//1, 720 * 2//1)
+    window.set_caption('Molecular Dynamics Simulation of Argon')
     pyglet.clock.schedule(game.update)
     print('Starting app')
     
@@ -68,8 +62,7 @@ if __name__ == '__main__':
         Pressure {pressure:.2f}
         """.format(particles=game.particles,
                    boxsize=game.size,
-             
-                temp=game.T,
+                   temp=game.T,
                    dens=game.density,
                    pressure=game.pressure))
     print('------------------------------------------')
