@@ -87,7 +87,6 @@ class Viewport(pyglet.window.Window):
             Time step size {h}
             Particles {particles}
             Boxsize {boxsize}
-            Average velocity {vel:.2f}
             Temperature {temp:.2f} K
             Pressure {pressure:.2f}
             Draw every {drawevery}
@@ -96,9 +95,8 @@ class Viewport(pyglet.window.Window):
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
                        boxsize=self.gamestate.size,
-                       vel=1,
                        temp=self.gamestate.T,
-                       pressure=1,
+                       pressure=self.gamestate.pressure,
                        drawevery=self.drawevery,
                        fps=pyglet.clock.get_fps() * self.drawevery,
                        time=2.15*self.gamestate.time)
