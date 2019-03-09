@@ -22,8 +22,9 @@ class Gamestate():
         self.particles = np.shape(state)[0]
         self.dimensions = np.shape(state)[1]
 
-        self.pressure = 1
-        self.density = self.particles/(self.size[0]*self.size[0]*self.size[0])
+        volume = self.size[0]*self.size[0]*self.size[0]
+        self.pressure = self.particles * self.T * 119.8 / volume
+        self.density = self.particles/volume
         
         self.dtype = dtype
         self.original_positions = state.copy()
@@ -48,7 +49,7 @@ class Gamestate():
         """
 
         self.velocities_update()  # first half
-        Lambda = np.sqrt(((self.particles-1)*3*self.T*119.8)/(np.sum(np.square(self.velocities))))
+        Lambda = np.sqrt(((self.particles-1)*3*self.T*119.8)/(np.sum(np.square(self.velocities)))) #IS THIS RIGHT?! NOT 1/119.8??!
         self.velocities = Lambda * self.velocities
         
         self.positions_update()
