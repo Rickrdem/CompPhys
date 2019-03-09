@@ -23,9 +23,11 @@ def plot_energy():
     plt.show()
 
 if __name__ == '__main__':
-    L = 4
-    
-    game = Gamestate(T=0.000001, lattice_constant=1.3, size=(L,L,L), dtype=np.float64)
+    L = 5
+    lattice_constant = 1.4
+    state = func.fcc_lattice(L, a=lattice_constant)
+
+    game = Gamestate(state, T=0.5, lattice_constant=1.4, size=(L,L,L), dtype=np.float64)
 
     # game.update(1)
 
@@ -36,6 +38,10 @@ if __name__ == '__main__':
 
     pyglet.clock.schedule(game.update)
     print('Starting app')
+    print('------------------------------------------')   
+    print('Number of particles:', game.particles)
+    print('Pressure:', game.pressure)
+    print('Density:', game.density)
     setup()
     pyglet.app.run()
     print('Average velocity:', np.sum(func.abs(game.velocities))/game.particles)
@@ -45,5 +51,6 @@ if __name__ == '__main__':
     plot_energy()
     plt.show()
     x=game.velocities
+    print('------------------------------------------')
     print("Done!")    
 

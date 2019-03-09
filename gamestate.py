@@ -5,38 +5,26 @@ from viewport import cube, icosahedron
 import cProfile
 
 class Gamestate():
-    def generate_state(self):
+    def generate_state(self, state):
         """ Generates a standard lattice of positions and velocities (currently random)
         :return:
         """
-#        self.positions = np.random.uniform(0, self.size[0], size=(self.particles, self.dimensions))# + np.array(self.size)/2
-        verts, faces = icosahedron()
-        # self.positions[:] = np.array([[10,10,10],[11,11,11]])
-        # self.positions[:] = verts/2 + np.asarray(self.size)/2
-        # self.positions[0,0] += 0.0000001
-        self.positions = func.fcc_lattice(self.size[0], a=self.lattice_constant)
-        # self.positions += np.random.uniform(-.1, .1, size=(self.particles, self.dimensions))
-#        self.velocities = np.zeros(shape=(self.particles, self.dimensions))
+        self.positions = state
         self.velocities[:] = np.random.normal(0, 0.1,size=(self.particles,self.dimensions))
         self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None,:]
-#         self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]
-        
-#        self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) # Missing a factor of 2 ?!
-#        self.distances_update()
-#        self.potential_energy.append(np.sum(func.U_reduced(self.distances)))
 
-               
-#        self.directions = np.angle(self.velocities[:,0]+1j*self.velocities[:,1])
-
-    def __init__(self, h=0.001, T=0.5, lattice_constant=1, size=(10,10,10), dtype=np.float32):
+    def __init__(self, state, h=0.001, T=0.5, lattice_constant=1, size=(10,10,10), dtype=np.float32):
         self.size = size
-        self.lattice_constant = lattice_constant
-        self.particles = np.shape(func.fcc_lattice(self.size[0], a=self.lattice_constant))[0]
-        self.dimensions = len(size)
+        self.particles = np.shape(state)[0]
+        self.dimensions = np.shape(state)[1]
         self.h = h
         self.m = 1        
         self.T = T
         self.time = 0
+        self.pressure = 1
+        self.density = self.particles/(self.size[0]*self.size[0]*self.size[0])
+        
+        
         self.dtype = dtype
         
         self.positions = np.zeros([self.particles,self.dimensions], dtype=dtype)
@@ -49,7 +37,7 @@ class Gamestate():
         self.kinetic_energy = []
         
         
-        self.generate_state()
+        self.generate_state(state)
 
 
     def update(self, a):
@@ -58,7 +46,7 @@ class Gamestate():
         Moves all the particles around
         :return:
         """
-        Lambda = np.sqrt(((self.particles-1)*self.T*118.9)/(np.sum(self.m*np.square(self.velocities))))
+        Lambda = np.sqrt(((self.particles-1)*self.T*118.9)/(np.sum(np.square(self.velocities))))
 
         self.velocities_update()  # first half
         self.velocities = Lambda * self.velocities
@@ -68,19 +56,18 @@ class Gamestate():
         self.forces_update()
         self.velocities_update()  # seconds half
         
-        Lambda = np.sqrt(((self.particles-1)*self.T*118.9)/(np.sum(self.m*np.square(self.velocities))))
+        Lambda = np.sqrt(((self.particles-1)*self.T*118.9)/(np.sum(np.square(self.velocities))))
         self.velocities = Lambda * self.velocities
 
-        self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) 
-
-        Lambda = np.sqrt(((self.particles-1)*self.T*118.9)/(np.sum(self.m*np.square(self.velocities))))
-
-
-        self.distances_in_matrix = func.distance_jit(self.positions, self.size)
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
 
+        self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) 
+
         self.potential_energy.append(1/2*np.sum(func.U_reduced(func.abs(self.distances))))
+#        self.potential_energy.append(func.sum_potential_jit(self.distances))
+
+        
         
         self.time += self.h
         
