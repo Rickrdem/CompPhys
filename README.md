@@ -6,4 +6,4 @@ https://visualgit.readthedocs.io/en/latest/pages/naming_convention.html
 
 - [X] Periodic distance function
 - [x] Pyglet viewport
-- [ ] Taylor expanded position evolution
+- [x] Taylor expanded position evolution
