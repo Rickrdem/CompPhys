@@ -22,6 +22,15 @@ def plot_energy():
 #    plt.hist(func.abs(game.velocities), bins=int(game.particles**0.5))
     plt.show()
 
+def plot_velocity_distribution():
+    fig, ax = plt.subplots()
+    ax.hist(func.abs(game.velocities), bins=int(game.particles**0.5))
+    ax.set_xlabel("Velocity")
+    ax.set_ylabel("#")
+    fig.tight_layout()
+    fig.show()
+    plt.show()
+
 def plot_diffusion():
     fig, ax = plt.subplots()
     time = 2.15*np.arange(0, game.h*len(game.diffusion), game.h)
@@ -33,7 +42,6 @@ def plot_diffusion():
     fig.show()
     plt.show()
    
-
 if __name__ == '__main__':
     L = 5
     lattice_constant = 1.2
@@ -50,6 +58,7 @@ if __name__ == '__main__':
 
     pyglet.clock.schedule(game.update)
     print('Starting app')
+    
     print('------------------------------------------')   
     print("""
         Particles {particles}
@@ -63,6 +72,7 @@ if __name__ == '__main__':
                 temp=game.T,
                    dens=game.density,
                    pressure=game.pressure))
+    print('------------------------------------------')
     
     setup()
     pyglet.app.run()
@@ -71,11 +81,6 @@ if __name__ == '__main__':
     
     plot_energy()
     plot_diffusion()
+    plot_velocity_distribution()
 
-    print('------------------------------------------')
-    print("Done!")    
-
-
-
-    x=game.velocities
-
+    print("Done!")
