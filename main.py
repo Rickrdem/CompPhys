@@ -22,12 +22,24 @@ def plot_energy():
 #    plt.hist(func.abs(game.velocities), bins=int(game.particles**0.5))
     plt.show()
 
+def plot_diffusion():
+    fig, ax = plt.subplots()
+    time = 2.15*np.arange(0, game.h*len(game.diffusion), game.h)
+    ax.plot(time, game.diffusion, c='b', label='$Diffusion$')
+    ax.set_xlabel("Time (ns)")
+    ax.set_ylabel("$<(x(t)-x(0))^2>$")
+    ax.legend()
+    fig.tight_layout()
+    fig.show()
+    plt.show()
+   
+
 if __name__ == '__main__':
     L = 5
-    lattice_constant = 1.4
+    lattice_constant = 1.2
     state = func.fcc_lattice(L, a=lattice_constant)
 
-    game = Gamestate(state, T=0.5, lattice_constant=1.4, size=(L,L,L), dtype=np.float64)
+    game = Gamestate(state, T=0.3, size=(L,L,L), dtype=np.float64)
 
     # game.update(1)
 
@@ -39,18 +51,31 @@ if __name__ == '__main__':
     pyglet.clock.schedule(game.update)
     print('Starting app')
     print('------------------------------------------')   
-    print('Number of particles:', game.particles)
-    print('Pressure:', game.pressure)
-    print('Density:', game.density)
+    print("""
+        Particles {particles}
+        Boxsize {boxsize}
+        Temperature {temp:.2f} K
+        Density {dens:.2f}
+        Pressure {pressure:.2f}
+        """.format(particles=game.particles,
+                   boxsize=game.size,
+             
+                temp=game.T,
+                   dens=game.density,
+                   pressure=game.pressure))
+    
     setup()
     pyglet.app.run()
-    print('Average velocity:', np.sum(func.abs(game.velocities))/game.particles)
 
     pyglet.clock.unschedule(game.update)
     
     plot_energy()
-    plt.show()
-    x=game.velocities
+    plot_diffusion()
+
     print('------------------------------------------')
     print("Done!")    
+
+
+
+    x=game.velocities
 
