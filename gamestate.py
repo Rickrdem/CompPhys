@@ -1,56 +1,45 @@
 import numpy as np
-from itertools import product
 import functions as func
-from viewport import cube, icosahedron
-import cProfile
+#import cProfile
 
 class Gamestate():
-    def generate_state(self):
-        """ Generates a standard lattice of positions and velocities (currently random)
+    def generate_state(self, state):
+        """ Generates a standard lattice of positions and velocities (currently fcc)
         :return:
         """
-#        self.positions = np.random.uniform(0, self.size[0], size=(self.particles, self.dimensions))# + np.array(self.size)/2
-        verts, faces = icosahedron()
-        # self.positions[:] = np.array([[10,10,10],[11,11,11]])
-        # self.positions[:] = verts/2 + np.asarray(self.size)/2
-        # self.positions[0,0] += 0.0000001
-        self.positions = func.fcc_lattice(self.size[0], a=1.5) + [0.1,0.1,0.1]
-        # self.positions += np.random.uniform(-.1, .1, size=(self.particles, self.dimensions))
-#        self.velocities = np.zeros(shape=(self.particles, self.dimensions))
+        self.positions = state.copy()
+        self.positions_not_bounded = state.copy()
         self.velocities[:] = np.random.normal(0, 0.1,size=(self.particles,self.dimensions))
         self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None,:]
-#         self.positions[:,:] %= np.asarray(self.size)[np.newaxis,:]
-        
-        # self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) # Missing a factor of 2 ?!
-        # self.distances_update()
-        # self.potential_energy.append(np.sum(func.U_reduced(self.distances)))
 
-        
-        print(self.kinetic_energy)
-        
-#        self.directions = np.angle(self.velocities[:,0]+1j*self.velocities[:,1])
-
-    def __init__(self, particles=100, h=0.001, size=(10,10,10), dtype=np.float32):
-        self.particles = particles
-        self.size = size
-        self.dimensions = len(size)
+    def __init__(self, state, h=0.001, T=0.5, size=(10,10,10), dtype=np.float32):
         self.h = h
         self.m = 1        
+        self.T = T
+        self.time = 0
+
+        self.size = size
+        self.particles = np.shape(state)[0]
+        self.dimensions = np.shape(state)[1]
+
+        volume = self.size[0]*self.size[0]*self.size[0]
+        self.pressure = self.particles * self.T * 119.8 / volume
+        self.density = self.particles/volume
         
         self.dtype = dtype
-        
-        self.positions = np.zeros([particles,self.dimensions], dtype=dtype)
-        self.velocities = np.zeros([particles,self.dimensions], dtype=dtype)
-        self.forces = np.zeros([particles,self.dimensions], dtype=dtype)
-        self.previous_forces = np.zeros([particles,self.dimensions], dtype=dtype)
-        self.distances = np.zeros([particles, particles, self.dimensions], dtype=dtype)
+        self.original_positions = state.copy()
+
+        self.positions = np.zeros([self.particles,self.dimensions], dtype=dtype)
+        self.velocities = np.zeros([self.particles,self.dimensions], dtype=dtype)
+        self.forces = np.zeros([self.particles,self.dimensions], dtype=dtype)
+        self.previous_forces = np.zeros([self.particles,self.dimensions], dtype=dtype)
+        self.distances = np.zeros([self.particles, self.particles, self.dimensions], dtype=dtype)
         
         self.potential_energy = []
         self.kinetic_energy = []
+        self.diffusion = []       
         
-        
-        self.generate_state()
-
+        self.generate_state(state)
 
     def update(self, a):
         """ Updates the gamestate
@@ -60,35 +49,43 @@ class Gamestate():
         """
 
         self.velocities_update()  # first half
+        Lambda = np.sqrt(((self.particles-1)*3*self.T*119.8)/(np.sum(np.square(self.velocities)))) #IS THIS RIGHT?! NOT 1/119.8??!
+        self.velocities = Lambda * self.velocities
+        
         self.positions_update()
         self.distances_update()
         self.forces_update()
         self.velocities_update()  # seconds half
+        
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
+        self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) 
 
-        self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) # Missing a factor of 2 ?!
-        self.potential_energy.append(np.sum(func.U_reduced(func.abs(self.distances))))
+#        self.potential_energy.append(1/2*np.sum(func.U_reduced(func.abs(self.distances))))
+        self.potential_energy.append(func.sum_potential_jit(self.distances))
+
+        self.diffusion.append(np.average(np.square((self.positions_not_bounded - self.original_positions))))
+
+
+        self.time += self.h
         
         
     def positions_update(self):
         """Update the positions of all particles in-place using velocity-verlet"""
-        self.positions[:] = self.positions + self.h*self.velocities# + 1/2*self.h**2 * self.forces
+        self.positions[:] = self.positions + self.h*self.velocities
+        self.positions_not_bounded[:] = self.positions_not_bounded + self.h*self.velocities
 
     def velocities_update(self):
         """Update the positions of all particles in-place using velocity-verlet"""
-        self.velocities[:] = self.velocities + self.h/2 *(self.forces)#+self.previous_forces)
-
-    
+        self.velocities[:] = self.velocities + self.h/2 *(self.forces)
+        
     def forces_update(self):
         """Update the forces acting on all particles in-place using velocity-verlet"""
         self.forces[:] = np.sum(func.force_jit(self.distances), axis=1)
-        # print('total force',np.sum(self.forces))
     
     def distances_update(self):
         """Update the NxNxD distance matrix with the nearest image convention"""
         self.distances[:] = func.distance_jit(self.positions, self.size)
-        # self.distances += np.transpose(self.distances, axes=(1,0,2))  # explicitly symmetrize
 
 
         
