@@ -39,23 +39,21 @@ def plot_diffusion():
     fig.show()
    
 def pair_correlation():
-    radius = np.arange(0.34, game.size[0], 0.05)
-    dr = 0.3
+    dr = 0.05
+    radius = np.arange(0.4, game.size[0], dr)
     pair_correlation = []
     for r in radius:
         distances = np.sqrt(np.sum(np.square(game.distances), axis=2))
         X = (distances > r) == True
         Y = (distances < r+dr) == True
         Z = X==Y
-    
-        n_r = np.average(np.sum(Z, axis=1))
         
+        n_r = np.average(np.sum(Z, axis=1))
         g_r = 2*game.volume/(game.particles*(game.particles-1))*n_r/(4*np.pi*r*r*dr)
-    
         pair_correlation.append(g_r)
     
     fig, ax = plt.subplots()
-    ax.plot(radius, pair_correlation/(np.sum(pair_correlation)*dr), c='b', label='Pair Correlation')
+    ax.plot(radius, pair_correlation/(np.sum(pair_correlation)), c='b', label='Pair Correlation')
     ax.set_xlabel("Radius")
     ax.set_ylabel("Correlation")
     ax.legend()
