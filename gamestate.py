@@ -17,14 +17,15 @@ class Gamestate():
         self.m = 1        
         self.T = T
         self.time = 0
+        self.dt = 0
 
         self.size = size
         self.particles = np.shape(state)[0]
         self.dimensions = np.shape(state)[1]
 
-        volume = self.size[0]*self.size[0]*self.size[0]
-        self.pressure = self.particles * self.T * 119.8 / volume
-        self.density = self.particles/volume
+        self.volume = self.size[0]*self.size[1]*self.size[2]
+        self.pressure = self.particles * self.T * 119.8 / self.volume
+        self.density = self.particles/self.volume
         
         self.dtype = dtype
         self.original_positions = state.copy()
@@ -38,6 +39,10 @@ class Gamestate():
         self.potential_energy = []
         self.kinetic_energy = []
         self.diffusion = []       
+        self.pair_correlation = []
+        
+#        self.maxdist = 0
+        
         
         self.generate_state(state)
 
@@ -66,8 +71,21 @@ class Gamestate():
 
         self.diffusion.append(np.average(np.square((self.positions_not_bounded - self.original_positions))))
 
+        self.pair_correlation.append(func.pair_correlation(self.distances, self.particles, self.volume))
 
-        self.time += self.h
+
+        """Find maximum possible distance between two atoms"""
+#        y = np.max(np.sqrt(np.sum(np.square(self.distances), axis=2)))
+#        if y > self.maxdist:
+#            self.x=y
+#        print('max=', self.maxdist) 
+        """Increase temparature by predifined time increment"""       
+#        self.dt+=2.15*self.h
+#        if self.dt > 0.1:
+#            self.dt = 0
+#            self.T += 0.05
+        
+        self.time += 2.15*self.h
         
         
     def positions_update(self):
