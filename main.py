@@ -60,13 +60,12 @@ def pair_correlation():
         X = (distances > r) == True
         Y = (distances < r+dr) == True
         Z = X==Y
-        
-        n_r = np.average(np.sum(Z, axis=1))
-        g_r = 2*game.volume/(game.particles*(game.particles-1))*n_r/(4*np.pi*r*r*dr)
+        n_r = np.sum(Z, axis=1)
+        g_r = 2*game.volume/(game.particles*(game.particles-1))*np.average(n_r)/(4*np.pi*r*r*dr)
         pair_correlation.append(g_r)
-    
+      
     fig, ax = plt.subplots()
-    ax.plot(radius, pair_correlation/(np.sum(pair_correlation)), c='b', label='Pair Correlation')
+    ax.plot(radius, pair_correlation/(np.sum(pair_correlation)*dr), c='b', label='Pair Correlation')
     ax.set_xlabel("Radius")
     ax.set_ylabel("Correlation")
     ax.legend()
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     lattice_constant = 1.3
     state = func.fcc_lattice(L, a=lattice_constant)
 
-    game = Gamestate(state, T=0.3, size=(L,L,L), dtype=np.float64)
+    game = Gamestate(state, T=1, size=(L,L,L), dtype=np.float64)
 
     print('Game created')
     window = Viewport(game, drawevery=1)
@@ -88,10 +87,11 @@ if __name__ == '__main__':
 
     width = GetSystemMetrics(0)
     height = GetSystemMetrics(1)
+    
     window.set_size(width * 2//3, height * 2//3)
-
     
     window.set_caption('Molecular Dynamics Simulation of Argon')
+
     pyglet.clock.schedule(game.update)
     print('Starting app')
     
