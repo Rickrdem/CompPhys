@@ -161,3 +161,20 @@ def abs(r):
     """Return the magnitude of the vectors contained in r"""
     return np.sqrt(np.sum(np.square(r), axis=-1))
 
+
+def pair_correlation(distances_xyz, particles, volume):
+    dr = 0.05
+    radius = np.arange(0.6, 0.9, dr)
+    pair_correlation = []
+    distances = np.sqrt(np.sum(np.square(distances_xyz), axis=2))
+    for r in radius:
+        X = (distances > r) == True
+        Y = (distances < r+dr) == True
+        Z = X==Y
+        
+        n_r = np.average(np.sum(Z, axis=1))
+        g_r = 2*volume/(particles*(particles-1))*n_r/(4*np.pi*r*r*dr)
+        pair_correlation.append(g_r)
+
+    return np.max(pair_correlation)
+
