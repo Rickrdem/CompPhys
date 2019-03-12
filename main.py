@@ -5,12 +5,14 @@ import pyglet
 from gamestate import Gamestate
 from viewport import Viewport, setup
 import matplotlib.pyplot as plt
+from win32api import GetSystemMetrics
+
 
 plt.close('all')
 
 def plot_energy():
     fig, ax = plt.subplots()
-    time = 2.15*np.arange(0, game.h*len(game.kinetic_energy), game.h)
+    time = np.arange(0, 2.15*game.h*len(game.kinetic_energy), 2.15*game.h)
     ax.plot(time, np.array(game.kinetic_energy[:]),c='r', label='$E_{kin}$')
     ax.plot(time, game.potential_energy, c='b', label='$E_{pot}$')
     ax.plot(time, np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='H')
@@ -30,13 +32,24 @@ def plot_velocity_distribution():
 
 def plot_diffusion():
     fig, ax = plt.subplots()
-    time = 2.15*np.arange(0, game.h*len(game.diffusion), game.h)
+    time = np.arange(0, 2.15*game.h*len(game.diffusion), 2.15*game.h)
     ax.plot(time, game.diffusion, c='b', label='$Diffusion$')
     ax.set_xlabel("Time (ns)")
     ax.set_ylabel("$<(x(t)-x(0))^2>$")
     ax.legend()
     fig.tight_layout()
     fig.show()
+
+def plot_pair_correlation_maximum():
+    fig, ax = plt.subplots()
+    time = np.arange(0, 2.15*game.h*len(game.diffusion), 2.15*game.h)
+    ax.plot(time, game.pair_correlation, c='b', label='Pair-Correlation maximum')
+    ax.set_xlabel("Time (ns)")
+    ax.set_ylabel("Correlation")
+    ax.legend()
+    fig.tight_layout()
+    fig.show()
+
    
 def pair_correlation():
     dr = 0.05
@@ -64,15 +77,20 @@ def pair_correlation():
     
 if __name__ == '__main__':
     L = 5
-    lattice_constant = 1.1
+    lattice_constant = 1.3
     state = func.fcc_lattice(L, a=lattice_constant)
 
-    game = Gamestate(state, T=0.2, size=(L,L,L), dtype=np.float64)
+    game = Gamestate(state, T=0.3, size=(L,L,L), dtype=np.float64)
 
     print('Game created')
     window = Viewport(game, drawevery=1)
     print('Windows created')
-    window.set_size(1280 * 2//1, 720 * 2//1)
+
+    width = GetSystemMetrics(0)
+    height = GetSystemMetrics(1)
+    window.set_size(width * 2//3, height * 2//3)
+
+    
     window.set_caption('Molecular Dynamics Simulation of Argon')
     pyglet.clock.schedule(game.update)
     print('Starting app')
@@ -100,5 +118,6 @@ if __name__ == '__main__':
     plot_energy()
     plot_diffusion()
     pair_correlation()
+#    plot_pair_correlation_maximum()
 
     print("Done!")
