@@ -37,18 +37,8 @@ def plot_diffusion(game):
     fig.tight_layout()
     fig.show()
 
-def plot_pair_correlation_maximum(game):
-    fig, ax = plt.subplots()
-    time = np.arange(0, 2.15*game.h*len(game.diffusion), 2.15*game.h)
-    ax.plot(time, game.pair_correlation, c='b', label='Pair-Correlation maximum')
-    ax.set_xlabel("Time (ns)")
-    ax.set_ylabel("Correlation")
-    ax.legend()
-    fig.tight_layout()
-    fig.show()
-
 def plot_pair_correlation(game, fig, ax):
-    dr = 0.05
+    dr = 1/game.particles**(1/2)
     radius = np.arange(0.4, game.size[0], dr)
     pair_correlation = []
     for r in radius:
@@ -62,8 +52,8 @@ def plot_pair_correlation(game, fig, ax):
       
 #    fig, ax = plt.subplots()
     ax.plot(radius, pair_correlation/(np.sum(pair_correlation)*dr), c='b', label='Pair Correlation')
-    ax.set_xlabel("Radius")
-    ax.set_ylabel("Correlation")
+    ax.set_xlabel("r/$\sigma$")
+    ax.set_ylabel("g(r/$\sigma$)")
     ax.legend()
     fig.tight_layout()
     fig.show()
@@ -93,12 +83,12 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     print('------------------------------------------')   
     print("""
         Particles {particles}
-        Boxsize {boxsize}
+        Boxsize {boxsize:.2f}
         Temperature {temp:.2f}
         Density {dens:.2f}
         Pressure {pressure:.2f}
         """.format(particles=game.particles,
-                   boxsize=game.size,
+                   boxsize=game.size[0],
                    temp=game.T,
                    dens=game.density,
                    pressure=game.pressure))
@@ -120,9 +110,9 @@ if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(plotting=True)
-    # main(temperature=0.5, density=1.2, particles=256, plotting=True)
-    # main(temperature=1, density=0.8, particles=256, plotting=True)
-    # main(temperature=3, density=0.3, particles=256, plotting=True)
+#    main(plotting=True)
+    main(temperature=0.5, density=1.2, particles=256, plotting=True)
+    #main(temperature=1, density=0.8, particles=256, plotting=True)
+    #main(temperature=3, density=0.3, particles=256, plotting=True)
 
     print("Done!")
