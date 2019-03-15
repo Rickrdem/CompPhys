@@ -71,8 +71,6 @@ class Gamestate():
 
         self.diffusion.append(np.average(np.square((self.positions_not_bounded - self.original_positions))))
 
-        self.pair_correlation.append(func.pair_correlation(self.distances, self.particles, self.volume))
-
 
         """Find maximum possible distance between two atoms"""
 #        y = np.max(np.sqrt(np.sum(np.square(self.distances), axis=2)))
