@@ -94,7 +94,8 @@ class Viewport(pyglet.window.Window):
             Time step size {h}
             Particles {particles}
             Boxsize {boxsize:.2f}
-            Temperature {temp:.2f}
+            Set temperature {temp:.2f}
+            Measured temperatured {mestemp:.2f}
             Density {density:.2f}
             Pressure {pressure:.2f}
             Draw every {drawevery}
@@ -104,6 +105,7 @@ class Viewport(pyglet.window.Window):
                        particles=self.gamestate.particles,
                        boxsize=self.gamestate.size[0],
                        temp=self.gamestate.T,
+                       mestemp=self.gamestate.measured_temperature,
                        density=self.gamestate.density,
                        pressure=self.gamestate.pressure,
                        drawevery=self.drawevery,
@@ -156,8 +158,10 @@ class Viewport(pyglet.window.Window):
                 self.drawevery = 1
         elif symbol==key.UP:
             self.gamestate.T = self.gamestate.T + 0.1
+            self.gamestate.thermostat = True
         elif symbol==key.DOWN:
             self.gamestate.T = self.gamestate.T - 0.1
+            self.gamestate.thermostat = True
             if self.gamestate.T <=0:
                 self.gamestate.T = 0.0000001
         elif symbol==key.V:
