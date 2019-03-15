@@ -47,7 +47,7 @@ def plot_pair_correlation_maximum(game):
     fig.tight_layout()
     fig.show()
 
-def pair_correlation(game, fig, ax):
+def plot_pair_correlation(game, fig, ax):
     dr = 0.05
     radius = np.arange(0.4, game.size[0], dr)
     pair_correlation = []
@@ -108,21 +108,21 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     pyglet.app.run()
 
     pyglet.clock.unschedule(game.update)
+    if plotting:
+        plot_velocity_distribution(game)
+        plot_energy(game)
+        plot_diffusion(game)
+        plot_pair_correlation(game, fig_combined_pc, ax_combined_pc)
+        plt.show()
 
-    plot_velocity_distribution(game)   
-    plot_energy(game)
-    plot_diffusion(game)
-    
-    pair_correlation(game, fig_combined_pc, ax_combined_pc)
-    plot_pair_correlation_maximum(game)    
     
 if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(temperature=0.5, density=1.2, particles=256, plotting=True)
-    main(temperature=1, density=0.8, particles=256, plotting=True)
-    main(temperature=3, density=0.3, particles=256, plotting=True)
+    main(plotting=True)
+    # main(temperature=0.5, density=1.2, particles=256, plotting=True)
+    # main(temperature=1, density=0.8, particles=256, plotting=True)
+    # main(temperature=3, density=0.3, particles=256, plotting=True)
 
-    plt.show()
     print("Done!")
