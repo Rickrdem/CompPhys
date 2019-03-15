@@ -118,17 +118,15 @@ def main(temperature, lattice_constant):
 if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
-#    for T in [0.2, 1, 3.9]:
-#        if T == 0.2:
-#            lattice_constant = 1.2
-#        elif T == 1:
-#            lattice_constant = 1.3
-#        else:
-#            lattice_constant = 1.6
+    for T in [0.5, 1, 3]:
+        if T == 0.5:# Solid
+            lattice_constant = 1.4
+        elif T == 1: # Liquid
+            lattice_constant = 1.6
+        elif T== 3: # Gas
+            lattice_constant = 2
 
-    T = 3
-    lattice_constant = 2
-    main(T, lattice_constant)
+        main(T, lattice_constant)
     
     plt.show()
     print("Done!")
