@@ -9,6 +9,13 @@ class Viewport(pyglet.window.Window):
         assert gamestate is not None
         super().__init__(resizable=True, vsync=False)
 
+        platform = pyglet.window.get_platform()
+        display = platform.get_default_display()
+        screen = display.get_default_screen()
+        screen_width = screen.width
+        screen_height = screen.height
+        self.set_size(screen_width*2//3, screen_height*2//3)
+
         self.drawevery = drawevery
 
         self.gamestate = gamestate

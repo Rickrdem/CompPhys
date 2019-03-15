@@ -5,7 +5,7 @@ import pyglet
 from gamestate import Gamestate
 from viewport import Viewport, setup
 import matplotlib.pyplot as plt
-from win32api import GetSystemMetrics
+# from win32api import GetSystemMetrics
 
 def plot_energy(game):
     fig, ax = plt.subplots()
@@ -79,10 +79,6 @@ def main(temperature, lattice_constant):
     window = Viewport(game, drawevery=1)
     print('Windows created')
 
-    width = GetSystemMetrics(0)
-    height = GetSystemMetrics(1)
-    
-    window.set_size(width * 2//3, height * 2//3)
     
     window.set_caption('Hexargon')
 
