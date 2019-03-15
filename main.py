@@ -7,11 +7,6 @@ from viewport import Viewport, setup
 import matplotlib.pyplot as plt
 from win32api import GetSystemMetrics
 
-fig_combined_pc, ax_combined_pc = plt.subplots()
-
-
-plt.close('all')
-
 def plot_energy(game):
     fig, ax = plt.subplots()
     time = np.arange(0, 2.15*game.h*len(game.kinetic_energy), 2.15*game.h)
@@ -52,7 +47,6 @@ def plot_pair_correlation_maximum(game):
     fig.tight_layout()
     fig.show()
 
-   
 def pair_correlation(game, fig, ax):
     dr = 0.05
     radius = np.arange(0.4, game.size[0], dr)
@@ -90,7 +84,7 @@ def main(temperature, lattice_constant):
     
     window.set_size(width * 2//3, height * 2//3)
     
-    window.set_caption('Molecular Dynamics Simulation of Argon')
+    window.set_caption('Hexargon')
 
     pyglet.clock.schedule(game.update)
     print('Starting app')
@@ -99,7 +93,7 @@ def main(temperature, lattice_constant):
     print("""
         Particles {particles}
         Boxsize {boxsize}
-        Temperature {temp:.2f} K
+        Temperature {temp:.2f}
         Density {dens:.2f}
         Pressure {pressure:.2f}
         """.format(particles=game.particles,
@@ -122,14 +116,19 @@ def main(temperature, lattice_constant):
     plot_pair_correlation_maximum(game)    
     
 if __name__ == '__main__':
-    for T in [0.2, 1, 3.9]:
-        if T == 0.2:
-            lattice_constant = 1.2
-        elif T == 1:
-            lattice_constant = 1.2
-        else:
-            lattice_constant = 1.6
+    plt.close('all')
+    fig_combined_pc, ax_combined_pc = plt.subplots()
+#    for T in [0.2, 1, 3.9]:
+#        if T == 0.2:
+#            lattice_constant = 1.2
+#        elif T == 1:
+#            lattice_constant = 1.3
+#        else:
+#            lattice_constant = 1.6
 
-        main(T, lattice_constant)
-
+    T = 3
+    lattice_constant = 2
+    main(T, lattice_constant)
+    
+    plt.show()
     print("Done!")
