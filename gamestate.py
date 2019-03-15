@@ -12,7 +12,7 @@ class Gamestate():
         self.velocities[:] = np.random.normal(0, 0.1,size=(self.particles,self.dimensions))
         self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None,:]
 
-    def __init__(self, state, h=0.001, T=0.5, size=(10,10,10), dtype=np.float32):
+    def __init__(self, state, h=0.005, T=0.5, size=(10,10,10), dtype=np.float32):
         self.h = h
         self.m = 1        
         self.T = T
@@ -54,7 +54,7 @@ class Gamestate():
         """
 
         self.velocities_update()  # first half
-        Lambda = np.sqrt(((self.particles-1)*3*self.T*119.8)/(np.sum(np.square(self.velocities)))) #IS THIS RIGHT?! NOT 1/119.8??!
+        Lambda = np.sqrt(((self.particles-1)*3*self.T)/(np.sum(np.square(self.velocities)))) #IS THIS RIGHT?! NOT 1/119.8??!
         self.velocities = Lambda * self.velocities
         
         self.positions_update()
