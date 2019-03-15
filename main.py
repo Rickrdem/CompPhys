@@ -69,9 +69,14 @@ def pair_correlation(game, fig, ax):
     fig.show()
   
     
-def main(temperature, lattice_constant):
-    L = 5
-    state = func.fcc_lattice(L, a=lattice_constant)
+def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False):
+    if starting_state == None:
+        L = np.power(particles/density, 1/3)
+        lattice_constant = L*np.power(4/particles, 1/3)
+        state = func.fcc_lattice(L, a=lattice_constant)
+    else:
+        state = starting_state
+        particles = starting_state.shape[0]
 
     game = Gamestate(state, T=temperature, size=(L,L,L), dtype=np.float64)
 
@@ -114,17 +119,10 @@ def main(temperature, lattice_constant):
 if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
-#    for T in [0.2, 1, 3.9]:
-#        if T == 0.2:
-#            lattice_constant = 1.2
-#        elif T == 1:
-#            lattice_constant = 1.3
-#        else:
-#            lattice_constant = 1.6
 
-    T = 3
-    lattice_constant = 2
-    main(T, lattice_constant)
-    
+    main(temperature=0.5, density=1.2, particles=256, plotting=True)
+    main(temperature=1, density=0.8, particles=256, plotting=True)
+    main(temperature=3, density=0.3, particles=256, plotting=True)
+
     plt.show()
     print("Done!")
