@@ -26,6 +26,8 @@ class Gamestate():
         self.volume = self.size[0]*self.size[1]*self.size[2]
         self.pressure = self.particles * self.T * 119.8 / self.volume
         self.density = self.particles/self.volume
+        self.measured_temperature = self.T
+        self.thermostat = True
         
         self.dtype = dtype
         self.original_positions = state.copy()
@@ -54,7 +56,13 @@ class Gamestate():
         """
 
         self.velocities_update()  # first half
-        Lambda = np.sqrt(((self.particles-1)*3*self.T)/(np.sum(np.square(self.velocities)))) #IS THIS RIGHT?! NOT 1/119.8??!
+        if self.thermostat:
+            Lambda = np.sqrt(((self.particles-1)*3*self.T)/(np.sum(np.square(self.velocities))))
+            if abs(1-Lambda) < 0.0001:
+                self.thermostat = False
+        else:
+            Lambda = 1
+        print(Lambda)    
         self.velocities = Lambda * self.velocities
         
         self.positions_update()
@@ -65,8 +73,9 @@ class Gamestate():
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
         self.kinetic_energy.append(np.sum(1/2*self.m*np.square(self.velocities))) 
+        
+        self.measured_temperature = np.average((np.square(self.velocities)))
 
-#        self.potential_energy.append(1/2*np.sum(func.U_reduced(func.abs(self.distances))))
         self.potential_energy.append(func.sum_potential_jit(self.distances))
 
         self.diffusion.append(np.average(np.square((self.positions_not_bounded - self.original_positions))))
