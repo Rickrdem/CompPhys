@@ -61,7 +61,7 @@ class Viewport(pyglet.window.Window):
         
         verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
 
-        verts = 1/10* verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
+        verts = 0.36* verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
 
         verts_per_shape = len(verts)
         faces_per_shape = len(faces)
@@ -76,7 +76,7 @@ class Viewport(pyglet.window.Window):
         
         if self.colors is None:
             self.colors = (verts.T/np.sum(verts, axis=1)).T
-
+        
         if hasattr(self, 'spheres'):
             self.spheres.vertices = verts.flatten()
         else:
@@ -93,23 +93,25 @@ class Viewport(pyglet.window.Window):
         text = """
             Time step size {h}
             Particles {particles}
-            Boxsize {boxsize}
-            Temperature {temp:.2f} K
+            Boxsize {boxsize:.2f}
+            Temperature {temp:.2f}
+            Density {density:.2f}
             Pressure {pressure:.2f}
             Draw every {drawevery}
             States per frame {fps:.2f}
             Elapsed time {time:.3f} ns
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
-                       boxsize=self.gamestate.size,
+                       boxsize=self.gamestate.size[0],
                        temp=self.gamestate.T,
+                       density=self.gamestate.density,
                        pressure=self.gamestate.pressure,
                        drawevery=self.drawevery,
                        fps=pyglet.clock.get_fps() * self.drawevery,
-                       time=2.15*self.gamestate.time)
+                       time=self.gamestate.time)
 
         document = pyglet.text.decode_text(text)
-        document.set_style(0, 0, dict(font_name='Arial', font_size=8))
+        document.set_style(0, 0, dict(font_name='Arial', font_size=18, color=(255,255,255,255)))
 
         width, height = self.get_size()
 
@@ -126,7 +128,7 @@ class Viewport(pyglet.window.Window):
             Vertical arrow keys alter temperature
             """
         document = pyglet.text.decode_text(text)
-        document.set_style(0, 0, dict(font_name='Arial', font_size=8))
+        document.set_style(0, 0, dict(font_name='Arial', font_size=8, color=(255,255,255,255)))
 
         instructions = pyglet.text.layout.TextLayout(document, width, height, multiline=False)
         instructions.x = -30
@@ -213,7 +215,7 @@ def setup():
     """
     # Set the color of "clear", i.e. the sky, in rgba.
 
-    glClearColor(0.5, 0.69, 1.0, 1)
+    glClearColor(0,0,0, 1)
 
     # Enable culling (not rendering) of back-facing facets -- facets that aren't
     # visible to you.
