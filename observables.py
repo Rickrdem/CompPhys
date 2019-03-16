@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 16 10:47:16 2019
-
-@author: rmerc
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 import functions as func
+
+import scipy.stats as stats
+import matplotlib.mlab as mlab
 
 def energy(game):
     fig, ax = plt.subplots()
@@ -21,10 +18,20 @@ def energy(game):
     fig.show()
 
 def velocity_distribution(game):
+    """Histogram of velicity distribution overlayed with a maxwell-boltzmann pfd fit"""
     fig, ax = plt.subplots()
-    ax.hist(func.abs(game.velocities), bins=int(game.particles**0.5))
+
+    velocities = func.abs(game.velocities)
+    
+    maxwell = stats.maxwell
+    params = maxwell.fit(velocities, floc=0)
+    x = np.linspace(0, np.max(velocities), 100)
+    ax.hist(velocities, bins=int(game.particles**(1/2)), density=1, facecolor='blue', alpha=0.75)
+    ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
+    
     ax.set_xlabel("Velocity")
-    ax.set_ylabel("#")
+    ax.set_ylabel("#/N")
+    ax.set_title("(mean,var)="+str(maxwell.stats(moments='mv')))
     fig.tight_layout()
     fig.show()
 
@@ -38,7 +45,7 @@ def diffusion(game):
     fig.tight_layout()
     fig.show()
 
-def pair_correlation(game, fig, ax):
+def pair_correlation(game, fig=None, ax=None):
     dr = 1/game.particles**(1/2)
     radius = np.arange(0.4, game.size[0], dr)
     pair_correlation = []
