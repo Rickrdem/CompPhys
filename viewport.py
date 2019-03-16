@@ -11,7 +11,10 @@ class Viewport(pyglet.window.Window):
 
         platform = pyglet.window.get_platform()
         display = platform.get_default_display()
-        screen = display.get_default_screen()
+        screens = display.get_screens()
+        for i in screens:
+            if i.x == i.y == 0:
+                screen = i
         screen_width = screen.width
         screen_height = screen.height
         self.set_size(screen_width*2//3, screen_height*2//3)
@@ -22,7 +25,7 @@ class Viewport(pyglet.window.Window):
         self.fpsdisplay = pyglet.window.FPSDisplay(self)
         
         self.rotation = [1, 0]
-        self.fov = 75.
+        self.fov = 90.
         self.colors = None
         self.batch = pyglet.graphics.Batch()
 
@@ -110,7 +113,7 @@ class Viewport(pyglet.window.Window):
                        pressure=self.gamestate.pressure,
                        drawevery=self.drawevery,
                        fps=pyglet.clock.get_fps() * self.drawevery,
-                       time=self.gamestate.time)
+                       time=2.15*self.gamestate.time)
 
         document = pyglet.text.decode_text(text)
         document.set_style(0, 0, dict(font_name='Arial', font_size=18, color=(255,255,255,255)))
