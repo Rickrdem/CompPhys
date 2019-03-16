@@ -15,10 +15,13 @@ class Viewport(pyglet.window.Window):
         for i in screens:
             if i.x == i.y == 0:
                 screen = i
+#        screen = display.get_default_screen()
         screen_width = screen.width
         screen_height = screen.height
         self.set_size(screen_width*2//3, screen_height*2//3)
 
+        self.fontsize = int(round(screen_height/110))
+    
         self.drawevery = drawevery
 
         self.gamestate = gamestate
@@ -116,7 +119,7 @@ class Viewport(pyglet.window.Window):
                        time=2.15*self.gamestate.time)
 
         document = pyglet.text.decode_text(text)
-        document.set_style(0, 0, dict(font_name='Arial', font_size=18, color=(255,255,255,255)))
+        document.set_style(0, 0, dict(font_name='Arial', font_size=self.fontsize, color=(255,255,255,255)))
 
         width, height = self.get_size()
 
@@ -127,17 +130,17 @@ class Viewport(pyglet.window.Window):
         meta_information.draw()
 
         text = """
-            Rotate the view by clicking and dragging
-            Scrolling zooms in and out of the view
+            Click and drag to rotate
+            Scroll to zoom
             Horizontal arrow keys alters states per frame
             Vertical arrow keys alter temperature
             """
         document = pyglet.text.decode_text(text)
-        document.set_style(0, 0, dict(font_name='Arial', font_size=8, color=(255,255,255,255)))
+        document.set_style(0, 0, dict(font_name='Arial', font_size=self.fontsize, color=(255,255,255,255)))
 
         instructions = pyglet.text.layout.TextLayout(document, width, height, multiline=False)
         instructions.x = -30
-        instructions.y = -height+15
+        instructions.y = -height+20
         instructions.anchor_x = 'left'
         instructions.anchor_y = 'bottom'
 
