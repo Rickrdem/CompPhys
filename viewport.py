@@ -129,18 +129,18 @@ class Viewport(pyglet.window.Window):
         meta_information.y = 0
         meta_information.draw()
 
-        text = """
+        text = u"""
             Click and drag to rotate
             Scroll to zoom
-            Horizontal arrow keys alters states per frame
-            Vertical arrow keys alter temperature
+            \u2190 \u2192 Alter states per frame
+            \u2191 \u2193 Alter temperature
             """
         document = pyglet.text.decode_text(text)
         document.set_style(0, 0, dict(font_name='Arial', font_size=self.fontsize, color=(255,255,255,255)))
 
         instructions = pyglet.text.layout.TextLayout(document, width, height, multiline=False)
         instructions.x = -30
-        instructions.y = -height+20
+        instructions.y = -height+25
         instructions.anchor_x = 'left'
         instructions.anchor_y = 'bottom'
 
