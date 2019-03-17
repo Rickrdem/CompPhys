@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import functions as func
 
 import scipy.stats as stats
-import matplotlib.mlab as mlab
 
 def energy(game):
     fig, ax = plt.subplots()
@@ -26,12 +25,12 @@ def velocity_distribution(game):
     maxwell = stats.maxwell
     params = maxwell.fit(velocities, floc=0)
     x = np.linspace(0, np.max(velocities), 100)
-    ax.hist(velocities, bins=int(game.particles**(1/2)), density=1, facecolor='blue', alpha=0.75)
+    ax.hist(velocities, bins=int(game.particles**(1/2)), density=1, facecolor='blue')
     ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
-    
+
     ax.set_xlabel("Velocity")
     ax.set_ylabel("#/N")
-    ax.set_title("(mean,var)="+str(maxwell.stats(moments='mv')))
+    ax.set_title("(params)="+str(params))
     fig.tight_layout()
     fig.show()
 
@@ -67,12 +66,28 @@ def pair_correlation(game, fig=None, ax=None):
     fig.show()
   
 def temperature(game):
-    fig, ax = plt.subplots()
+    fig, [ax, ax1] = plt.subplots(nrows=1, ncols=2, sharex=False, sharey=True)
     time = np.arange(game.h, 2.15*game.h*len(game.kinetic_energy), 2.15*game.h)
-    ax.plot(time, np.array(game.temperature)[:,0], c='r', label='Set')
-    ax.plot(time, np.array(game.temperature)[:,1], c='b', label='Measured')
+    temp = np.array(game.temperature)
+    
+    mu = np.average(temp[:,1])
+    sigma = np.sqrt(np.average(np.square(temp[:,1])) - np.square(np.average(temp[:,1])))
+
+    x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
+    
+    ax.plot(time, temp[:,0], c='r', label='Set')
+    ax.plot(time, temp[:,1], c='b', label='Measured')
+    
+    ax1.plot(stats.norm.pdf(x, mu, sigma), x, color='blue', label='Temperature pdf')    
+    ax1.hlines(y=mu, xmin=0, xmax=np.max(stats.norm.pdf(x, mu, sigma)), linestyle=':')
+    
     ax.set_xlabel("Time (ns)")
     ax.set_ylabel("Temparature")
+    ax1.set_xlabel("Probability")
+    
+    ax1.set_title("mean, $\sigma$ = {m:.2f}, {s:.2f}".format(m=mu, s=sigma))
+    
     ax.legend()
+    ax1.legend()
     fig.tight_layout()
     fig.show()
