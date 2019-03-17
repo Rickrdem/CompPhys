@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab   
+import scipy.stats as stats
+
 import functions as func
 
-import scipy.stats as stats
 
 def energy(game):
     fig, ax = plt.subplots()
@@ -66,28 +68,38 @@ def pair_correlation(game, fig=None, ax=None):
     fig.show()
   
 def temperature(game):
-    fig, [ax, ax1] = plt.subplots(nrows=1, ncols=2, sharex=False, sharey=True)
     time = np.arange(game.h, 2.15*game.h*len(game.kinetic_energy), 2.15*game.h)
     temp = np.array(game.temperature)
     
-    mu = np.average(temp[:,1])
-    sigma = np.sqrt(np.average(np.square(temp[:,1])) - np.square(np.average(temp[:,1])))
-
-    x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
+    # Set up the axes with gridspec
+    fig = plt.figure()
+    grid = plt.GridSpec(1, 6, fig, hspace=0.2, wspace=0.2)
     
+    ax = fig.add_subplot(grid[0, 0:4])
+    ax2 = fig.add_subplot(grid[0, 4:], sharey=ax)
+
+    # Plot data in main axis ax
     ax.plot(time, temp[:,0], c='r', label='Set')
     ax.plot(time, temp[:,1], c='b', label='Measured')
+
+    # histogram on the attached axis ax2    
+    n, bins, patches = ax2.hist(temp[:,1], int(np.sqrt(len(temp[:,1]))), density=1,
+                orientation='horizontal', color='blue')
+
+    (mu, sigma) = stats.norm.fit(temp[:,1])
+    y = mlab.normpdf(bins, mu, sigma)
+    ax2.hlines(y=mu, xmin=0, xmax=np.max(y), color='red', linestyle=':')
     
-    ax1.plot(stats.norm.pdf(x, mu, sigma), x, color='blue', label='Temperature pdf')    
-    ax1.hlines(y=mu, xmin=0, xmax=np.max(stats.norm.pdf(x, mu, sigma)), linestyle=':')
-    
+    ax2.plot(y, bins, 'r--', linewidth=2, label='pdf')
+
+    # Set axes labels
     ax.set_xlabel("Time (ns)")
     ax.set_ylabel("Temparature")
-    ax1.set_xlabel("Probability")
+    ax2.set_xlabel("Probability density")
     
-    ax1.set_title("mean, $\sigma$ = {m:.2f}, {s:.2f}".format(m=mu, s=sigma))
+    ax2.set_title("mean, $\sigma$ = {m:.2f}, {s:.2f}".format(m=mu, s=sigma))
+    plt.setp(ax2.get_yticklabels(), visible=False)
     
     ax.legend()
-    ax1.legend()
-    fig.tight_layout()
+    ax2.legend()
     fig.show()
