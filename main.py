@@ -1,11 +1,11 @@
 import numpy as np
 import functions as func
-
+import matplotlib.pyplot as plt
 import pyglet
+
 from gamestate import Gamestate
 from viewport import Viewport, setup
 import observables as obs
-import matplotlib.pyplot as plt
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False):
     if starting_state == None:
@@ -20,11 +20,13 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
 
     print('Game created')
     window = Viewport(game, drawevery=1)
-    print('Windows created')
-
     
+    icon16 = pyglet.image.load("icon_bits16.png")
+    icon32 = pyglet.image.load("icon_bits32.png")
+    window.set_icon(icon16, icon32)
     window.set_caption('Hexargon')
-
+    print('Windows created')
+    
     pyglet.clock.schedule(game.update)
     print('Starting app')
     
@@ -46,6 +48,7 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     pyglet.app.run()
 
     pyglet.clock.unschedule(game.update)
+    
     if plotting:
         obs.velocity_distribution(game)
         obs.energy(game)
@@ -59,7 +62,7 @@ if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(temperature=1, density=0.8, particles=500, plotting=True)
+    main(temperature=1, density=0.8, particles=256, plotting=True)
 
     
     """Excersise"""
