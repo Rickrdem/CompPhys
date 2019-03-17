@@ -12,6 +12,7 @@ class Gamestate():
         self.positions_not_bounded = state.copy()
         self.velocities[:] = np.random.normal(0, 0.1,size=(self.particles,self.dimensions))
         self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None,:]
+        self.measured_temperature = np.average(np.square(self.velocities))
 
     def __init__(self, state, h=0.005, T=0.5, size=(10,10,10), dtype=np.float32):
         self.h = h
@@ -25,7 +26,7 @@ class Gamestate():
         self.volume = self.size[0]*self.size[1]*self.size[2]
         self.pressure = self.particles * self.T / self.volume
         self.density = self.particles/self.volume
-        self.measured_temperature = self.T
+        self.measured_temperature = 0
         self.thermostat = True
         
         self.dtype = dtype
@@ -56,9 +57,10 @@ class Gamestate():
         self.velocities_update()  # first half
 
         if self.thermostat:
-            Lambda = np.sqrt(((self.particles-1)*3*self.T)/(np.sum(np.square(self.velocities))))
-            self.velocities = Lambda * self.velocities
-            if abs(1-Lambda) < 0.0001:
+            lambda_ = np.sqrt(((self.particles-1)*3*self.T)/(np.sum(np.square(self.velocities))))
+            self.velocities = lambda_ * self.velocities
+            print(lambda_)
+            if abs(self.T - self.measured_temperature) < 0.001:
                 self.thermostat = False
         
         self.positions_update()
@@ -66,7 +68,7 @@ class Gamestate():
         self.forces_update()
         self.velocities_update()  # seconds half
         
-        self.measured_temperature = np.average((np.square(self.velocities)))
+        self.measured_temperature = np.average(np.square(self.velocities))
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
         
