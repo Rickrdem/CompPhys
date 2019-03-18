@@ -97,9 +97,18 @@ def temperature(game):
     ax.set_ylabel("Temparature")
     ax2.set_xlabel("Probability density")
     
-    ax2.set_title("mean, $\sigma$ = {m:.2f}, {s:.2f}".format(m=mu, s=sigma))
+    ax2.set_title("$\mu$, $\sigma$ = {m:.2f}, {s:.2f}".format(m=mu, s=sigma))
     plt.setp(ax2.get_yticklabels(), visible=False)
     
     ax.legend()
     ax2.legend()
     fig.show()
+    
+def bootstrap(observable):
+    set_of_resampled_quantity = []
+    for i in range(100):    
+        random_set = np.random.choice(observable, size=len(observable))
+        set_of_resampled_quantity.append(np.average(random_set))
+    set_of_resampled_quantity = np.array(set_of_resampled_quantity)
+    sigma = np.sqrt(np.average(np.square(set_of_resampled_quantity))-np.square(np.average(set_of_resampled_quantity)))
+    return sigma
