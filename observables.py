@@ -39,9 +39,14 @@ def velocity_distribution(game):
 def diffusion(game):
     fig, ax = plt.subplots()
     time = np.arange(game.h, 2.15*game.h*len(game.diffusion), 2.15*game.h)
+    
+    p, cov = np.polyfit(x=time, y=game.diffusion, deg=1, full=False, cov=True)
+   
     ax.plot(time, game.diffusion, c='b', label='$Diffusion$')
+    ax.plot(time, p[0]*time+p[1], color='black', label='linear fit')
     ax.set_xlabel("Time (ns)")
     ax.set_ylabel("$<(x(t)-x(0))^2>$")
+    ax.set_title("Fit: $<(x(t)-x(0))^2>$=2Dt+b; D={D:.4f}$\pm$ {std:.4f}, b={b:.3f}".format(D=p[0]/2, std=np.sqrt(cov[0,0]), b=p[1]))
     ax.legend()
     fig.tight_layout()
     fig.show()
@@ -79,10 +84,10 @@ def temperature(game):
     ax2 = fig.add_subplot(grid[0, 4:], sharey=ax)
 
     # Plot data in main axis ax
-    ax.plot(time, temp[:,0], c='r', label='Set')
     ax.plot(time, temp[:,1], c='b', label='Measured')
+    ax.plot(time, temp[:,0], c='r', label='Set')
 
-    # histogram on the attached axis ax2    
+    # Normalized histogram on the attached axis ax2    
     n, bins, patches = ax2.hist(temp[:,1], int(np.sqrt(len(temp[:,1]))), density=1,
                 orientation='horizontal', color='blue')
 
@@ -92,7 +97,6 @@ def temperature(game):
     
     ax2.plot(y, bins, 'r--', linewidth=2, label='pdf')
 
-    # Set axes labels
     ax.set_xlabel("Time (ns)")
     ax.set_ylabel("Temparature")
     ax2.set_xlabel("Probability density")
@@ -104,11 +108,10 @@ def temperature(game):
     ax2.legend()
     fig.show()
     
+    
 def bootstrap(observable):
-    set_of_resampled_quantity = []
-    for i in range(100):    
-        random_set = np.random.choice(observable, size=len(observable))
-        set_of_resampled_quantity.append(np.average(random_set))
-    set_of_resampled_quantity = np.array(set_of_resampled_quantity)
-    sigma = np.sqrt(np.average(np.square(set_of_resampled_quantity))-np.square(np.average(set_of_resampled_quantity)))
+    n = 1000
+    random_set = np.random.choice(observable, size=n*len(observable)).reshape((len(observable), n))
+    set_of_averages = np.average(random_set, axis=0)
+    sigma = np.sqrt(np.average(np.square(set_of_averages))-np.square(np.average(set_of_averages)))
     return sigma
