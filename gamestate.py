@@ -63,7 +63,9 @@ class Gamestate():
             self.velocities = lambda_ * self.velocities
             if abs(self.T - self.measured_temperature) < 0.001:
                 self.thermostat = False
-        
+        if abs(self.T - self.measured_temperature) > 0.15:
+            self.thermostat = True
+            
         self.positions_update()
         self.distances_update()
         self.forces_update()
