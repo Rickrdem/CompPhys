@@ -33,6 +33,7 @@ class Gamestate():
         
         self.positions = np.zeros([self.particles,self.dimensions], dtype=dtype)
         self.original_positions = np.zeros([self.particles,self.dimensions], dtype=dtype)
+        self.positions_not_bounded = np.zeros([self.particles,self.dimensions], dtype=dtype)   
         self.velocities = np.zeros([self.particles,self.dimensions], dtype=dtype)
         self.forces = np.zeros([self.particles,self.dimensions], dtype=dtype)
         self.distances = np.zeros([self.particles, self.particles, self.dimensions], dtype=dtype)
@@ -41,6 +42,7 @@ class Gamestate():
         self.kinetic_energy = []
         self.diffusion = []       
         self.temperature = []
+        self.set_temperature = []
 #        self.dt = 0       
 #        self.maxdist = 0
         
@@ -59,7 +61,6 @@ class Gamestate():
         if self.thermostat:
             lambda_ = np.sqrt(((self.particles-1)*3*self.T)/(np.sum(np.square(self.velocities))))
             self.velocities = lambda_ * self.velocities
-            print(lambda_)
             if abs(self.T - self.measured_temperature) < 0.001:
                 self.thermostat = False
         
@@ -75,7 +76,8 @@ class Gamestate():
         self.kinetic_energy.append(np.sum(1/2*np.square(self.velocities))) 
         self.potential_energy.append(func.sum_potential_jit(self.distances))
         self.diffusion.append(np.average(np.square((self.positions_not_bounded - self.original_positions))))
-        self.temperature.append([self.T, self.measured_temperature])
+        self.temperature.append(self.measured_temperature)
+        self.set_temperature.append(self.T)
 
         """Find maximum possible distance between two atoms"""
 #        y = np.max(np.sqrt(np.sum(np.square(self.distances), axis=2)))

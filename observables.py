@@ -75,6 +75,7 @@ def pair_correlation(game, fig=None, ax=None):
 def temperature(game):
     time = np.arange(game.h, 2.15*game.h*len(game.kinetic_energy), 2.15*game.h)
     temp = np.array(game.temperature)
+    set_temp = np.array(game.set_temperature)
     
     # Set up the axes with gridspec
     fig = plt.figure()
@@ -84,14 +85,14 @@ def temperature(game):
     ax2 = fig.add_subplot(grid[0, 4:], sharey=ax)
 
     # Plot data in main axis ax
-    ax.plot(time, temp[:,1], c='b', label='Measured')
-    ax.plot(time, temp[:,0], c='r', label='Set')
+    ax.plot(time, temp, c='b', label='Measured')
+    ax.plot(time, set_temp, c='r', label='Set')
 
     # Normalized histogram on the attached axis ax2    
-    n, bins, patches = ax2.hist(temp[:,1], int(np.sqrt(len(temp[:,1]))), density=1,
+    n, bins, patches = ax2.hist(temp, int(np.sqrt(len(temp))), density=1,
                 orientation='horizontal', color='blue')
 
-    (mu, sigma) = stats.norm.fit(temp[:,1])
+    (mu, sigma) = stats.norm.fit(temp)
     y = mlab.normpdf(bins, mu, sigma)
     ax2.hlines(y=mu, xmin=0, xmax=np.max(y), color='red', linestyle=':')
     
