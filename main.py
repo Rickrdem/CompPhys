@@ -21,10 +21,6 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     print('Game created')
     window = Viewport(game, drawevery=1)
     
-    icon16 = pyglet.image.load("icon_bits16.png")
-    icon32 = pyglet.image.load("icon_bits32.png")
-    window.set_icon(icon16, icon32)
-    window.set_caption('Hexargon')
     print('Windows created')
     
     pyglet.clock.schedule(game.update)
@@ -42,7 +38,6 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
                    temp=game.T,
                    dens=game.density,
                    pressure=game.pressure))
-    print('------------------------------------------')
     
     setup()
     pyglet.app.run()
@@ -56,18 +51,22 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         obs.pair_correlation(game, fig_combined_pc, ax_combined_pc)
         obs.temperature(game)
         plt.show()
+    print("""
+    Specific heat {c_v:.2f}
+    """.format(c_v=obs.specific_heat(game)))
 
+    print('------------------------------------------')
     
 if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(temperature=1, density=0.8, particles=256, plotting=True)
+    main(temperature=1, density=0.8, particles=500, plotting=True)
 
     
     """Excersise"""
-#    main(temperature=0.5, density=1.2, particles=256, plotting=True)
-#    main(temperature=1, density=0.8, particles=256, plotting=True)
-#    main(temperature=3, density=0.3, particles=256, plotting=True)
+#    main(temperature=0.5, density=1.2, particles=500, plotting=True)
+#    main(temperature=1, density=0.8, particles=500, plotting=True)
+#    main(temperature=3, density=0.3, particles=500, plotting=True)
 
     print("Done!")
