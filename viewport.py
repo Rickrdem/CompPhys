@@ -3,6 +3,7 @@ import numpy as np
 from pyglet.gl.gl import *
 from pyglet.gl.glu import *
 import pyglet.window.key as key
+from functions import abs
 
 class Viewport(pyglet.window.Window):
     def __init__(self, gamestate=None, drawevery=1):
@@ -36,7 +37,52 @@ class Viewport(pyglet.window.Window):
         self.colors = None
         self.batch = pyglet.graphics.Batch()
 
+    def set_2d(self):
+        """ Configure OpenGL for drawing 2d objects such as the fps-counter
+        """
+        width, height = self.get_size()
+        glDisable(GL_DEPTH_TEST)
+        glViewport(0, 0, width, height)
+
+        # Ortho projection
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, width, 0, height, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+
+    def set_3d(self):
+        """ Configure OpenGL for drawing 3d objects such as the 'spheres'
+        """
+        width, height = self.get_size()
+        glEnable(GL_DEPTH_TEST)  # Checking whether ojects are in front or behind each other
+        glViewport(0, 0, width, height)
+
+        # set perspective transformation to unity
+
+        glMatrixMode(GL_PROJECTION)  # load the projection matrix
+        glLoadIdentity()  # set to unity
+        gluPerspective(self.fov, width / float(height), 0.1, 3)  # set the projection matrix to perspective
+
+        glTranslatef(0, 0, -1.1)  # move the world/camera back 1.1 sigma in the z direction
+
+        # set modelview rotation
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+
+        theta, phi = self.rotation
+        glRotatef(theta, 0, 1, 0)  # rotate horizontal
+        glRotatef(-phi, np.cos(np.deg2rad(theta)), 0, np.sin(np.deg2rad(phi)))  # rotate vertical
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
     def on_draw(self):
+        """
+        The method called every update of the screen.
+
+        The Event loop supplied by pyglet handles the calling of this method. This method will be called after
+        the update method and after a small pause that allows for user input.
+        """
         for i in range(self.drawevery-1):
             self.gamestate.update(0)  # calculate self.drawevery-1 extra states before rendering
         self.clear()
@@ -50,6 +96,9 @@ class Viewport(pyglet.window.Window):
         self.draw_hud()
 
     def draw_bounding_box(self):
+        """
+        Draw a bounding box in the window that shows the periodic bounds.
+        """
         verts, faces = cube()
         verts /=2
         # verts /= self.gamestate.size[0]
@@ -66,6 +115,12 @@ class Viewport(pyglet.window.Window):
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     def particles_to_batch(self):
+        """
+        Puts all particles in the batch before rendering.
+
+        All particles are decorated with an icosahedron before being loaded into the vertex buffer. The color buffer
+        is filled in the first frame to show the initial starting positions of all vertices.
+        """
         gamestate = self.gamestate
         positions = (gamestate.positions - np.asarray(gamestate.size) / 2) / np.asarray(gamestate.size)[np.newaxis, :]
         
@@ -84,8 +139,9 @@ class Viewport(pyglet.window.Window):
 
         faces = (faces.flatten()[:, np.newaxis] + verts_per_shape * (np.arange(particles))).T
         
-        if self.colors is None:
-            self.colors = (verts.T/np.sum(verts, axis=1)).T
+        if self.colors is None:  # set colors in first render
+            self.colors = np.repeat(positions, verts_per_shape, axis=0).flatten()
+            self.colors = rescale(self.colors, 0.2, 1)  # rescale to pastel colors
         
         if hasattr(self, 'spheres'):
             self.spheres.vertices = verts.flatten()
@@ -100,6 +156,9 @@ class Viewport(pyglet.window.Window):
             )
 
     def draw_hud(self):
+        """
+        Draw the hud to the screen
+        """
         text = """
             Time step size {h}
             Particles {particles}
@@ -183,45 +242,6 @@ class Viewport(pyglet.window.Window):
             self.fov =1
         elif self.fov >= 180:
             self.fov = 180
-
-    def set_2d(self):
-        """ Configure OpenGL for drawing 2d objects such as the fps-counter
-        """
-        width, height = self.get_size()
-        glDisable(GL_DEPTH_TEST)
-        glViewport(0, 0, width, height)
-
-        # Ortho projection
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, width, 0, height, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-
-    def set_3d(self):
-        """ Configure OpenGL for drawing 3d objects
-        """
-        width, height = self.get_size()
-        glEnable(GL_DEPTH_TEST)
-        glViewport(0, 0, width, height)
-
-        # set perspective transformation to unity
-
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(self.fov, width / float(height), 0.1, 3)
-
-        glTranslatef(0, 0, -1.1)
-
-        # set modelview rotation
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-
-        theta, phi = self.rotation
-        glRotatef(theta, 0, 1, 0)
-        glRotatef(-phi, np.cos(np.deg2rad(theta)), 0, np.sin(np.deg2rad(phi)))
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
 
 def setup():
@@ -317,3 +337,9 @@ def icosahedron():
         [9, 8, 1]
     ])
     return vertices, faces
+
+def rescale(data, min, max):
+    data -= np.min(data)
+    data *= (max - min)/np.max(data)
+    data += min
+    return data
