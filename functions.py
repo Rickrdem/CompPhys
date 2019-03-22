@@ -68,8 +68,8 @@ def fcc_lattice(boxsize, a=1, dim=3):
         
     return fcc
 
-def U_reduced(r):
-    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0))
+#def U_reduced(r):
+#    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0))
 
 @numba.njit()
 def sum_potential_jit(r):
@@ -131,7 +131,8 @@ def sum_potential_jit(r):
 @numba.njit()
 def force_jit(r):
     """
-    Calculate the total force on particle N due to the contributions of all other particles in the standard Lennard-Jones potential
+    Calculate the total force on particle N due to the contributions of all other particles 
+    in the standard Lennard-Jones potential.
     :param r: NxNxd matrix containing all the distances between all particles in reduced units.
     :return: Nxd matrix containing the force on every particle N in every dimension d.
     """
