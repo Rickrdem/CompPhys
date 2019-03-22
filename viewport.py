@@ -12,10 +12,10 @@ class Viewport(pyglet.window.Window):
         platform = pyglet.window.get_platform()
         display = platform.get_default_display()
         screens = display.get_screens()
-        for i in screens:
+        for i in screens:   # Select main screen from display
             if i.x == i.y == 0:
                 screen = i
-#        screen = display.get_default_screen()
+
         screen_width = screen.width
         screen_height = screen.height
         self.set_size(screen_width*2//3, screen_height*2//3)
@@ -105,7 +105,7 @@ class Viewport(pyglet.window.Window):
             Density {density:.2f}
             Pressure {pressure:.2f}
             Draw every {drawevery}
-            States per frame {fps:.2f}
+            States per second {fps:.2f}
             Elapsed time {time:.3f} ns
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
@@ -132,7 +132,7 @@ class Viewport(pyglet.window.Window):
         text = u"""
             Click and drag to rotate
             Scroll to zoom
-            \u2190 \u2192 Alter states per frame
+            \u2190 \u2192 Alter draw every
             \u2191 \u2193 Alter temperature
             """
         document = pyglet.text.decode_text(text)
