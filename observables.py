@@ -23,16 +23,22 @@ def velocity_distribution(game):
     fig, ax = plt.subplots()
 
     velocities = func.abs(game.velocities)
+        
+    y, bin_edges = np.histogram(velocities, bins=int(np.sqrt(len(velocities))))
+    bincenters = 0.5*(bin_edges[1:] + bin_edges[:-1])
+    menStd     = np.sqrt(y)
+    width      = np.max(velocities)/int(np.sqrt(len(velocities)))
+    ax.bar(bincenters, y, width=width, color='b', yerr=menStd)
     
-    maxwell = stats.maxwell
-    params = maxwell.fit(velocities, floc=0)
-    x = np.linspace(0, np.max(velocities), 100)
-    ax.hist(velocities, bins=int(game.particles**(1/2)), density=1, facecolor='blue')
-    ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
-
+#    maxwell = stats.maxwell
+#    params = maxwell.fit(velocities, floc=0)
+#    x = np.linspace(0, np.max(velocities), 100)
+#    ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
+    
+    
     ax.set_xlabel("Velocity")
     ax.set_ylabel("#/N")
-    ax.set_title("(params)="+str(params))
+#    ax.set_title("(params)="+str(params))
     fig.tight_layout()
     fig.show()
 
@@ -109,6 +115,15 @@ def temperature(game):
     ax2.legend()
     fig.show()
     
+def specific_heat(game):
+    K = np.array(game.kinetic_energy)
+    N = game.particles
+    a = np.average(np.square(K))
+    b = np.square(np.average(K))
+    
+    c_v = 1/(2/(3*N)*(1-((a/b)-1)*3*N/2))
+    return c_v
+
     
 def bootstrap(observable):
     n = 1000
