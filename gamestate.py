@@ -2,11 +2,22 @@ import numpy as np
 import functions as func
 
 class Gamestate():
+    """Molecular dynamics integrator.
+
+    This class contains the methods required to simulate a molecular dynamics simulation.
+    Typical usage is to initialise with a state and propogate that state with the update method.
+
+    :param state: A Nxd numpy array containing the starting positions of all particles.
+    :param h: The time step in reduced units that is used in Verlet integration.
+    :param T: The temperature in reduced units that the program is set to.
+    :param size: A tuple of length d that contains the size size of the periodic bounds.
+    :param dtype: The datatype class that is used for the simulation.
+    """
     def generate_state(self, state):
-        """ Generates a standard lattice of positions and velocities (currently fcc)
+        """ Loads up the original state and adds some noise in the velocities.
         """
-        self.positions = state.copy()
-        self.original_positions = state.copy()
+        self.positions[:] = np.asarray(state, dtype=self.dtype).copy()
+        self.original_positions = self.positions.copy()
         self.positions_not_bounded = state.copy()
         self.velocities[:] = np.random.normal(0, 0.1, size=(self.particles, self.dimensions))
         self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None, :]
@@ -41,6 +52,7 @@ class Gamestate():
         self.diffusion = []
         self.temperature = []
         self.set_temperature = []
+
         self.generate_state(state)
 
     def update(self, a):
