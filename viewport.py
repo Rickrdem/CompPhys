@@ -9,10 +9,6 @@ class Viewport(pyglet.window.Window):
     def __init__(self, gamestate=None, drawevery=1):
         assert gamestate is not None
         super().__init__(resizable=True, vsync=False)
-        icon16 = pyglet.image.load("icon_bits16.png")
-        icon32 = pyglet.image.load("icon_bits32.png")
-        self.set_icon(icon16, icon32)
-        self.set_caption('Hexargon')
 
         platform = pyglet.window.get_platform()
         display = platform.get_default_display()
@@ -24,14 +20,14 @@ class Viewport(pyglet.window.Window):
         screen_width = screen.width
         screen_height = screen.height
         self.set_size(screen_width*2//3, screen_height*2//3)
-
         self.fontsize = int(round(screen_height/110))
-    
+        self.hud = True
+
         self.drawevery = drawevery
 
         self.gamestate = gamestate
         self.fpsdisplay = pyglet.window.FPSDisplay(self)
-        
+
         self.rotation = [1, 0]
         self.fov = 90.
         self.colors = None
@@ -93,7 +89,7 @@ class Viewport(pyglet.window.Window):
 
         self.set_2d()
 
-        self.draw_hud()
+        if self.hud: self.draw_hud()
 
     def draw_bounding_box(self):
         """
@@ -123,7 +119,7 @@ class Viewport(pyglet.window.Window):
         """
         gamestate = self.gamestate
         positions = (gamestate.positions - np.asarray(gamestate.size) / 2) / np.asarray(gamestate.size)[np.newaxis, :]
-        
+
         verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
 
         verts = 0.36* verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
@@ -138,11 +134,11 @@ class Viewport(pyglet.window.Window):
         verts[:, :min(3, dimensions)] += positions.repeat(verts_per_shape, axis=0)
 
         faces = (faces.flatten()[:, np.newaxis] + verts_per_shape * (np.arange(particles))).T
-        
+
         if self.colors is None:  # set colors in first render
             self.colors = np.repeat(positions, verts_per_shape, axis=0).flatten()
             self.colors = rescale(self.colors, 0.2, 1)  # rescale to pastel colors
-        
+
         if hasattr(self, 'spheres'):
             self.spheres.vertices = verts.flatten()
         else:
@@ -166,18 +162,20 @@ class Viewport(pyglet.window.Window):
             Set temperature {temp:.2f}
             Measured temperatured {mestemp:.2f}
             Density {density:.2f}
+            Pressure {pressure:.2f}
             Draw every {drawevery}
             States per second {fps:.2f}
-            Elapsed time {time:.3f}
+            Elapsed time {time:.3f} ns
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
                        boxsize=self.gamestate.size[0],
                        temp=self.gamestate.T,
                        mestemp=self.gamestate.measured_temperature,
                        density=self.gamestate.density,
+                       pressure=self.gamestate.pressure,
                        drawevery=self.drawevery,
                        fps=pyglet.clock.get_fps() * self.drawevery,
-                       time=self.gamestate.time)
+                       time=2.15*self.gamestate.time)
 
         document = pyglet.text.decode_text(text)
         document.set_style(0, 0, dict(font_name='Arial', font_size=self.fontsize, color=(255,255,255,255)))
@@ -233,6 +231,8 @@ class Viewport(pyglet.window.Window):
                 self.gamestate.T = 0.0000001
         elif symbol==key.V:
             self.set_vsync(not self.vsync)
+        elif symbol==key.P:
+            self.hud = not self.hud
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         self.fov -= scroll_y
@@ -255,6 +255,9 @@ def setup():
 
 
 def triangle():
+    """
+    Returns simply the set positons of the vertices and
+    """
     vertices = np.asarray([
         [-1, -.5, 0],
         [1, -0.5, 0],
