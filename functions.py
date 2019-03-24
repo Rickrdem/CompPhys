@@ -3,23 +3,15 @@ import numba
 from itertools import product
 
 
-#def distance_completely_vectorized(positions, boxsize):
-#    """
-#    Calculates the distance vectors r_ij for every particle i to every particle j
-#    in each dimension
-#
-#    """
-#    L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
-#    L = boxsize[0]
-#    direction_vector = np.mod((positions[:,np.newaxis,:] - positions[np.newaxis,:,:] + L/2),L) - L/2
-#    return direction_vector
-#
-#@numba.njit()
-#def mindist(a,b,L):
-#    return (a-b+L/2)%L - L/2
-
 @numba.jit(parallel=True)
 def distance_jit(positions, boxsize):
+    """
+    Calculate the distance between each two points give the minimal image convention
+    :param positions: NxM array
+    :param boxsize: tuple
+    :return: NxN array of distances
+    """   
+
     L = np.array(boxsize)
     particles, dimensions = positions.shape
     distances = np.empty((particles,particles,dimensions), dtype=positions.dtype)
@@ -35,18 +27,16 @@ def distance_jit(positions, boxsize):
                     d = d-L[k]
                 distances[i,j,k] = d
                 distances[j,i,k] = -d
-    return distances
-
-#def sc_lattice(boxsize, a=1, dim=3):
-#    """Returns a simple cubic lattice with  lattice constant a .
-#    Points are  a/4 away from the boundary.
-#    Returns for dim=3: nparray([[x1,y1,z1],[x2,y2,z2],...,[xN,yN,zN]]), where
-#    N is the number of nodes.
-#    """
-#    return np.array(list(product(np.arange(a/4, boxsize-a/4, a), repeat=dim)))
-        
+    return distances        
 
 def fcc_lattice(boxsize, a=1, dim=3):
+    """
+    Form a faced centerd cubic lattice.
+    :param boxsize: float of the side lengt of a square box
+    :param a: float of the lattice constant of the fcc
+    :param dim: int of the dimension of the system
+    :return: Nxdim array of coordinates of all N lattice point
+    """   
     sc1 = np.array(list(product(np.arange(a/4, boxsize-a/4, a), repeat=dim)))
 
     sc2 = np.array(list(product(np.arange(a/4, boxsize-a/4, a), repeat=dim)))
@@ -67,9 +57,6 @@ def fcc_lattice(boxsize, a=1, dim=3):
     fcc = np.delete(fcc, mask, axis=0)
         
     return fcc
-
-#def U_reduced(r):
-#    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0))
 
 @numba.njit()
 def sum_potential_jit(r):
@@ -103,31 +90,6 @@ def sum_potential_jit(r):
                 Total_U += U[i, j, k]
     return Total_U
 
-#def absolute_force_reduced(r):
-#    """
-#    F = - 1/r * dU/dr * vec{x}
-#    """
-#    return  ( 24 *( (np.divide(2, np.power(r,14), out=np.zeros_like(r), where=r!=0)) - (np.divide(2, np.power(r,8), out=np.zeros_like(r), where=r!=0))))
-
-#def force_reduced(r):
-#    """Calculate the vectorised force matrix using the distances between all particles r"""
-#    dist = abs(r)
-#    direction = np.divide(r, dist[:,:,np.newaxis], out=np.zeros_like(r), where=r != 0)
-#    return direction*24*(2*np.power(dist, -13, out=np.zeros_like(dist), where=dist!=0)
-#                          - np.power(dist, -7, out=np.zeros_like(dist), where=dist!=0)
-#                          )[:,:,np.newaxis]
-#
-#def force_fast(r):
-#    """
-#    Apparently r*r*r is faster than np.power(r,3). Who knew!
-#    :param r: NxNxd matrix containing all the distances between all particles in reduced units
-#    """
-#    dist = abs(r)
-#    direction = np.divide(r,dist[:,:,None], where=r!=0, out=np.zeros_like(r))
-#    out = np.zeros_like(r)
-#    return direction * 24 *(np.divide(2,dist*dist*dist*dist*dist*dist*dist*dist*dist*dist*dist*dist*dist, out=np.zeros_like(dist), where=dist!=0)
-#                            - np.divide(1,dist*dist*dist*dist*dist*dist*dist, out=np.zeros_like(dist), where=dist!=0))[:,:,None]
-#
 @numba.njit()
 def force_jit(r):
     """
@@ -163,4 +125,49 @@ def abs(r):
     return np.sqrt(np.sum(np.square(r), axis=-1))
 
 
+"""The following functions are from a earlier stage in the project, they make
+use of the properties of numpy. Numba does is faster, hence our decision to
+choose numba"""
+#def distance_completely_vectorized(positions, boxsize):
+#    """
+#    Calculates the distance vectors r_ij for every particle i to every particle j
+#    in each dimension
+#
+#    """
+#    L = np.asarray(boxsize)[np.newaxis,np.newaxis,:]
+#    L = boxsize[0]
+#    direction_vector = np.mod((positions[:,np.newaxis,:] - positions[np.newaxis,:,:] + L/2),L) - L/2
+#    return direction_vector
+#
+#@numba.njit()
+#def mindist(a,b,L):
+#    return (a-b+L/2)%L - L/2
 
+#def U_reduced(r):
+#    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0))
+
+#def absolute_force_reduced(r):
+#    """
+#    F = - 1/r * dU/dr * vec{x}
+#    """
+#    return  ( 24 *( (np.divide(2, np.power(r,14), out=np.zeros_like(r), where=r!=0)) - (np.divide(2, np.power(r,8), out=np.zeros_like(r), where=r!=0))))
+
+#def force_reduced(r):
+#    """Calculate the vectorised force matrix using the distances between all particles r"""
+#    dist = abs(r)
+#    direction = np.divide(r, dist[:,:,np.newaxis], out=np.zeros_like(r), where=r != 0)
+#    return direction*24*(2*np.power(dist, -13, out=np.zeros_like(dist), where=dist!=0)
+#                          - np.power(dist, -7, out=np.zeros_like(dist), where=dist!=0)
+#                          )[:,:,np.newaxis]
+#
+#def force_fast(r):
+#    """
+#    Apparently r*r*r is faster than np.power(r,3). Who knew!
+#    :param r: NxNxd matrix containing all the distances between all particles in reduced units
+#    """
+#    dist = abs(r)
+#    direction = np.divide(r,dist[:,:,None], where=r!=0, out=np.zeros_like(r))
+#    out = np.zeros_like(r)
+#    return direction * 24 *(np.divide(2,dist*dist*dist*dist*dist*dist*dist*dist*dist*dist*dist*dist*dist, out=np.zeros_like(dist), where=dist!=0)
+#                            - np.divide(1,dist*dist*dist*dist*dist*dist*dist, out=np.zeros_like(dist), where=dist!=0))[:,:,None]
+#
