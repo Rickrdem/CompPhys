@@ -10,8 +10,8 @@ class Gamestate():
         self.positions = state.copy()
         self.original_positions = state.copy()
         self.positions_not_bounded = state.copy()
-        self.velocities[:] = np.random.normal(0, 0.1,size=(self.particles,self.dimensions))
-        self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None,:]
+        self.velocities[:] = np.random.normal(0, 0.1, size=(self.particles,self.dimensions))
+        self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None,:] #No net velocity in the system
         self.measured_temperature = np.average(np.square(self.velocities))
 
     def __init__(self, state, h=0.005, T=0.5, size=(10,10,10), dtype=np.float32):
@@ -24,7 +24,6 @@ class Gamestate():
         self.dimensions = np.shape(state)[1]
 
         self.volume = self.size[0]*self.size[1]*self.size[2]
-        self.pressure = self.particles * self.T / self.volume
         self.density = self.particles/self.volume
         self.measured_temperature = 0
         self.thermostat = True
@@ -81,19 +80,7 @@ class Gamestate():
         self.temperature.append(self.measured_temperature)
         self.set_temperature.append(self.T)
 
-        """Find maximum possible distance between two atoms"""
-#        y = np.max(np.sqrt(np.sum(np.square(self.distances), axis=2)))
-#        if y > self.maxdist:
-#            self.x=y
-#        print('max=', self.maxdist) 
-        """Increase temparature by predifined time increment"""       
-#        self.dt+=2.15*self.h
-#        if self.dt > 0.1:
-#            self.dt = 0
-#            self.T += 0.05
-        
         self.time += self.h
-        
         
     def positions_update(self):
         """Update the positions of all particles in-place using velocity-verlet"""
