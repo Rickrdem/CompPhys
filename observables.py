@@ -48,13 +48,13 @@ def velocity_distribution(game):
     
     maxwell = stats.maxwell
     params = maxwell.fit(velocities, floc=0)
+    mean, var = maxwell.stats(*params, moments='mv')
     x = np.linspace(0, np.max(velocities), 100)
     ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
     
-    
     ax.set_xlabel("Velocity")
     ax.set_ylabel("#/N")
-    ax.set_title("(params)="+str(params))
+    ax.set_title(r"$\mu$={m:.2f}, $\sigma$={s:.3f}".format(m=mean, s=var*.5))
     fig.tight_layout()
     fig.show()
 
@@ -69,7 +69,7 @@ def diffusion(game):
     ax.plot(time, p[0]*time+p[1], color='black', label='linear fit')
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$<(r(t)-r(0))^2>$")
-    ax.set_title("Fit: y=ax+b; a={a:.4f}$\pm$ {std:.4f}, b={b:.3f}".format(a=p[0], std=np.sqrt(cov[0,0]), b=p[1]))
+    ax.set_title("Linear fit: y=ax+b; a={a:.4f}$\pm$ {std:.4f}, b={b:.3f}".format(a=p[0], std=np.sqrt(cov[0,0]), b=p[1]))
     ax.legend()
     fig.tight_layout()
     fig.show()
@@ -98,7 +98,6 @@ def pair_correlation(game, fig=None, ax=None):
   
 def temperature(game):
     """Timetrace of the temperature of the system."""
-
     time = np.arange(0, game.h*len(game.kinetic_energy), game.h)
     temp = np.array(game.temperature)
     set_temp = np.array(game.set_temperature)
