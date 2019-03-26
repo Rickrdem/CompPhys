@@ -11,9 +11,23 @@ def energy(game):
     and the sum of those is displayed"""
     fig, ax = plt.subplots()
     time = np.arange(0, game.h*len(game.kinetic_energy), game.h)
-    ax.plot(time, np.array(game.kinetic_energy[:]),c='r', label='$E_{kin}$')
-    ax.plot(time, game.potential_energy, c='b', label='$E_{pot}$')
-    ax.plot(time, np.asarray(game.kinetic_energy)+game.potential_energy, c='black', label='$E_{tot}$')
+    total_energy = np.asarray(game.kinetic_energy)+game.potential_energy
+    ax.plot(time, np.array(game.kinetic_energy[:]),c='r', label='$E_k$')
+    ax.plot(time, game.potential_energy, c='b', label='$E_p$')
+    ax.plot(time, total_energy, c='black', label='$E_t$')
+    
+    kinetic_average, kinetic_sigma = bootstrap(game.kinetic_energy)
+    potential_average, potential_sigma = bootstrap(game.potential_energy)
+    tot_average, tot_sigma = bootstrap(total_energy)
+    
+    ax.set_title(r"""$\mu(E_k, E_p, E_t)$ = ({a:.1f}, {b:.1f}, {c:.1f}),
+                 $\sigma(E_k, E_p, E_t)$ = ({d:.1f}, {e:.1f}, {f:.1f})""".format(a=kinetic_average,
+                                                                                  b=potential_average,
+                                                                                  c=tot_average,
+                                                                                  d=kinetic_sigma,
+                                                                                  e=potential_sigma,
+                                                                                  f=tot_sigma))
+
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$E/\epsilon$")
     ax.legend()
@@ -55,7 +69,7 @@ def diffusion(game):
     ax.plot(time, p[0]*time+p[1], color='black', label='linear fit')
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$<(r(t)-r(0))^2>$")
-    ax.set_title("Fit: $<(r(t)-r(0))^2>$=2Dt+b; D={D:.4f}$\pm$ {std:.4f}, b={b:.3f}".format(D=p[0]/2, std=np.sqrt(cov[0,0]), b=p[1]))
+    ax.set_title("Fit: y=ax+b; a={a:.4f}$\pm$ {std:.4f}, b={b:.3f}".format(a=p[0], std=np.sqrt(cov[0,0]), b=p[1]))
     ax.legend()
     fig.tight_layout()
     fig.show()
@@ -114,7 +128,7 @@ def temperature(game):
     ax.set_ylabel(r"$T$")
     ax2.set_xlabel("Probability density")
     
-    ax2.set_title("$\mu$, $\sigma$ = {m:.2f}, {s:.2f}".format(m=mu, s=sigma))
+    ax2.set_title("$\mu$={m:.2f}, $\sigma$={s:.3f}".format(m=mu, s=sigma))
     plt.setp(ax2.get_yticklabels(), visible=False)
     
     ax.legend()
@@ -136,4 +150,5 @@ def bootstrap(observable):
     random_set = np.random.choice(observable, size=n*len(observable)).reshape((len(observable), n))
     set_of_averages = np.average(random_set, axis=0)
     sigma = np.sqrt(np.average(np.square(set_of_averages))-np.square(np.average(set_of_averages)))
-    return sigma
+    mean = np.average(set_of_averages)
+    return mean, sigma
