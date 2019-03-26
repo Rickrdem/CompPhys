@@ -162,20 +162,18 @@ class Viewport(pyglet.window.Window):
             Set temperature {temp:.2f}
             Measured temperatured {mestemp:.2f}
             Density {density:.2f}
-            Pressure {pressure:.2f}
             Draw every {drawevery}
             States per second {fps:.2f}
-            Elapsed time {time:.3f} ns
+            Elapsed time {time:.3f}
             """.format(h=self.gamestate.h,
                        particles=self.gamestate.particles,
                        boxsize=self.gamestate.size[0],
                        temp=self.gamestate.T,
                        mestemp=self.gamestate.measured_temperature,
                        density=self.gamestate.density,
-                       pressure=self.gamestate.pressure,
                        drawevery=self.drawevery,
                        fps=pyglet.clock.get_fps() * self.drawevery,
-                       time=2.15*self.gamestate.time)
+                       time=self.gamestate.time)
 
         document = pyglet.text.decode_text(text)
         document.set_style(0, 0, dict(font_name='Arial', font_size=self.fontsize, color=(255,255,255,255)))
