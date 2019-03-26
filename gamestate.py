@@ -13,16 +13,6 @@ class Gamestate():
     :param size: A tuple of length d that contains the size size of the periodic bounds.
     :param dtype: The datatype class that is used for the simulation.
     """
-    def generate_state(self, state):
-        """ Loads up the original state and adds some noise in the velocities.
-        """
-        self.positions[:] = np.asarray(state, dtype=self.dtype).copy()
-        self.original_positions = self.positions.copy()
-        self.positions_not_bounded = state.copy()
-        self.velocities[:] = np.random.normal(0, 0.1, size=(self.particles, self.dimensions))
-        self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None, :] #No net velocity in the system
-        self.measured_temperature = np.average(np.square(self.velocities))
-
     def __init__(self, state, h=0.005, T=0.5, size=(10, 10, 10), dtype=np.float32):
         self.h = h
         self.T = T
@@ -54,6 +44,17 @@ class Gamestate():
 
         self.generate_state(state)
 
+    def generate_state(self, state):
+        """ Loads up the original state and adds some noise in the velocities.
+        """
+        self.positions[:] = np.asarray(state, dtype=self.dtype).copy()
+        self.original_positions = self.positions.copy()
+        self.positions_not_bounded = state.copy()
+        self.velocities[:] = np.random.normal(0, 0.1, size=(self.particles, self.dimensions))
+        self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None, :] #No net velocity in the system
+        self.measured_temperature = np.average(np.square(self.velocities))
+
+
     def update(self, a):
         """ Updates the gamestate
 
@@ -71,6 +72,7 @@ class Gamestate():
 
         if abs(self.T - self.measured_temperature) > 0.15:
             self.thermostat = True
+            
         self.positions_update()
         self.distances_update()
         self.forces_update()
