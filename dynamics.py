@@ -75,11 +75,9 @@ class Dynamics():
         self.positions_update()
         self.distances_update()
         self.forces_update()
-        self.velocities_update()  # seconds half
+        self.velocities_update()  # second half
 
-        # self.measured_temperature = np.average(np.square(self.velocities))
         self.measured_temperature = obs.temperature(func.abs(self.velocities))
-        # self.measured_temperature = obs.temperature(self.velocities)
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
 
