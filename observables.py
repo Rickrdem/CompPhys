@@ -138,6 +138,7 @@ def temperature(simulation_state):
     fig.show()
     
 def specific_heat(simulation_state):
+    """Calculate specific heat of the stystem"""
     K = np.array(simulation_state.kinetic_energy)
     N = simulation_state.particles
     a = np.average(np.square(K))
@@ -147,6 +148,7 @@ def specific_heat(simulation_state):
     return c_v
 
 def bootstrap(data, function, n=100):
+    """Bootstrap an observable, given a specific function"""
     observables = []
     for i in range(n):
         resampled = np.random.choice(data, size=len(data), replace=True)
