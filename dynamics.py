@@ -1,7 +1,7 @@
 import numpy as np
 import functions as func
 
-class Gamestate():
+class Dynamics():
     """Molecular dynamics integrator.
 
     This class contains the methods required to simulate a molecular dynamics simulation.
@@ -59,7 +59,6 @@ class Gamestate():
         """ Updates the gamestate
 
         Moves all the particles around
-        :return:
         """
 
         self.velocities_update()  # first half

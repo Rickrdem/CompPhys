@@ -6,20 +6,20 @@ import scipy.stats as stats
 import functions as func
 
 
-def energy(game):
+def energy(simulation_state):
     """Timetrace of the energy in the system. Kinetic energy, potential enery 
     and the sum of those is displayed"""
     fig, ax = plt.subplots()
-    time = np.arange(0, game.h*len(game.kinetic_energy), game.h)
-    total_energy = np.asarray(game.kinetic_energy)+game.potential_energy
-    ax.plot(time, np.array(game.kinetic_energy[:]),c='r', label='$E_k$')
-    ax.plot(time, game.potential_energy, c='b', label='$E_p$')
+    time = np.arange(0, simulation_state.h * len(simulation_state.kinetic_energy), simulation_state.h)
+    total_energy = np.asarray(simulation_state.kinetic_energy) + simulation_state.potential_energy
+    ax.plot(time, np.array(simulation_state.kinetic_energy[:]), c='r', label='$E_k$')
+    ax.plot(time, simulation_state.potential_energy, c='b', label='$E_p$')
     ax.plot(time, total_energy, c='black', label='$E_t$')
     
-    kinetic_average = np.average(game.kinetic_energy)
-    kinetic_sigma = bootstrap(game.kinetic_energy, np.average)
-    potential_average = np.average(game.potential_energy)
-    potential_sigma = bootstrap(game.potential_energy, np.average)
+    kinetic_average = np.average(simulation_state.kinetic_energy)
+    kinetic_sigma = bootstrap(simulation_state.kinetic_energy, np.average)
+    potential_average = np.average(simulation_state.potential_energy)
+    potential_sigma = bootstrap(simulation_state.potential_energy, np.average)
     tot_average = np.average(total_energy)
     tot_sigma = bootstrap(total_energy, np.average)
     
@@ -61,14 +61,14 @@ def velocity_distribution(game):
     fig.tight_layout()
     fig.show()
 
-def diffusion(game):
+def diffusion(simulation_state):
     """Timetrace of the diffusion in the system."""
     fig, ax = plt.subplots()
-    time = np.arange(0, game.h*len(game.diffusion), game.h)
+    time = np.arange(0, simulation_state.h * len(simulation_state.diffusion), simulation_state.h)
     
-    p, cov = np.polyfit(x=time, y=game.diffusion, deg=1, full=False, cov=True)
+    p, cov = np.polyfit(x=time, y=simulation_state.diffusion, deg=1, full=False, cov=True)
    
-    ax.plot(time, game.diffusion, c='b', label='$Diffusion$')
+    ax.plot(time, simulation_state.diffusion, c='b', label='$Diffusion$')
     ax.plot(time, p[0]*time+p[1], color='black', label='linear fit')
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$<(r(t)-r(0))^2>$")
@@ -77,18 +77,18 @@ def diffusion(game):
     fig.tight_layout()
     fig.show()
 
-def pair_correlation(game, fig=None, ax=None):
+def pair_correlation(simulation_state, fig=None, ax=None):
     """Plot of the pair correlation function"""
-    dr = 1/game.particles**(1/2)
-    radius = np.arange(0.4, game.size[0], dr)
+    dr = 1 / simulation_state.particles ** (1 / 2)
+    radius = np.arange(0.4, simulation_state.size[0], dr)
     pair_correlation = []
     for r in radius:
-        distances = np.sqrt(np.sum(np.square(game.distances), axis=2))
+        distances = np.sqrt(np.sum(np.square(simulation_state.distances), axis=2))
         X = (distances > r) == True
         Y = (distances < r+dr) == True
         Z = X==Y
         n_r = np.sum(Z, axis=1)
-        g_r = 2*game.volume/(game.particles*(game.particles-1))*np.average(n_r)/(4*np.pi*r*r*dr)
+        g_r = 2 * simulation_state.volume / (simulation_state.particles * (simulation_state.particles - 1)) * np.average(n_r) / (4 * np.pi * r * r * dr)
         pair_correlation.append(g_r)
     if fig is None or ax is None:
         fig, ax = plt.subplots()
@@ -99,11 +99,11 @@ def pair_correlation(game, fig=None, ax=None):
     fig.tight_layout()
     fig.show()
   
-def temperature(game):
+def temperature(simulation_state):
     """Timetrace of the temperature of the system."""
-    time = np.arange(0, game.h*len(game.kinetic_energy), game.h)
-    temp = np.array(game.temperature)
-    set_temp = np.array(game.set_temperature)
+    time = np.arange(0, simulation_state.h * len(simulation_state.kinetic_energy), simulation_state.h)
+    temp = np.array(simulation_state.temperature)
+    set_temp = np.array(simulation_state.set_temperature)
     
     # Set up the axes with gridspec
     fig = plt.figure()
@@ -137,9 +137,9 @@ def temperature(game):
     ax2.legend()
     fig.show()
     
-def specific_heat(game):
-    K = np.array(game.kinetic_energy)
-    N = game.particles
+def specific_heat(simulation_state):
+    K = np.array(simulation_state.kinetic_energy)
+    N = simulation_state.particles
     a = np.average(np.square(K))
     b = np.square(np.average(K))
     

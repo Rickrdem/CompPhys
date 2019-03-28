@@ -5,7 +5,7 @@ The program consists of 5 files:
     main.py, 
     observables.py, 
     functions.py, 
-    gamestate.py and 
+    dynamics.py and
     viewport.py
 and requires two images:
     icon_bits16.png
@@ -19,7 +19,7 @@ import functions as func
 import matplotlib.pyplot as plt
 import pyglet
 
-from gamestate import Gamestate
+from dynamics import Dynamics
 from viewport import Viewport, setup
 import observables as obs
 
@@ -32,14 +32,14 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         state = starting_state
         particles = starting_state.shape[0]
     
-    game = Gamestate(state, T=temperature, size=(L,L,L), dtype=np.float64)
+    simulation_state = Dynamics(state, T=temperature, size=(L, L, L), dtype=np.float64)
 
-    print('Game created')
-    window = Viewport(game, drawevery=1)
+    print('Simulation state created')
+    window = Viewport(simulation_state, drawevery=1)
     
     print('Windows created')
     
-    pyglet.clock.schedule(game.update)
+    pyglet.clock.schedule(simulation_state.update)
     print('Starting app')
     
     print('------------------------------------------')   
@@ -48,26 +48,26 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         Boxsize {boxsize:.2f}
         Temperature {temp:.2f}
         Density {dens:.2f}
-        """.format(particles=game.particles,
-                   boxsize=game.size[0],
-                   temp=game.T,
-                   dens=game.density))
+        """.format(particles=simulation_state.particles,
+                   boxsize=simulation_state.size[0],
+                   temp=simulation_state.T,
+                   dens=simulation_state.density))
     
     setup()
     pyglet.app.run()
 
-    pyglet.clock.unschedule(game.update)
+    pyglet.clock.unschedule(simulation_state.update)
     
     if plotting:
-        obs.velocity_distribution(game)
-        obs.energy(game)
-        obs.diffusion(game)
-        obs.pair_correlation(game, fig_combined_pc, ax_combined_pc)
-        obs.temperature(game)
+        obs.velocity_distribution(simulation_state)
+        obs.energy(simulation_state)
+        obs.diffusion(simulation_state)
+        obs.pair_correlation(simulation_state, fig_combined_pc, ax_combined_pc)
+        obs.temperature(simulation_state)
         plt.show()
     print("""
     Specific heat {c_v:.2f}
-    """.format(c_v=obs.specific_heat(game)))
+    """.format(c_v=obs.specific_heat(simulation_state)))
 
     print('------------------------------------------')
     
