@@ -11,7 +11,6 @@ def distance_jit(positions, boxsize):
     :param boxsize: tuple
     :return: NxN array of distances
     """   
-
     L = np.array(boxsize)
     particles, dimensions = positions.shape
     distances = np.empty((particles,particles,dimensions), dtype=positions.dtype)
@@ -53,7 +52,7 @@ def fcc_lattice(boxsize, a=1, dim=3):
     
     fcc = np.concatenate((sc1, sc2, sc3, sc4))
     
-    mask = np.where(np.all((fcc>=boxsize)==False, axis=1)==False) #remove all positions>L
+    mask = np.where(np.all((fcc>=boxsize)==False, axis=1)==False) #remove all positions>boxsize
     fcc = np.delete(fcc, mask, axis=0)
         
     return fcc
@@ -139,10 +138,6 @@ choose numba"""
 #    direction_vector = np.mod((positions[:,np.newaxis,:] - positions[np.newaxis,:,:] + L/2),L) - L/2
 #    return direction_vector
 #
-#@numba.njit()
-#def mindist(a,b,L):
-#    return (a-b+L/2)%L - L/2
-
 #def U_reduced(r):
 #    return 4 * (np.divide(1, np.power(r,12), out=np.zeros_like(r), where=r!=0) - np.divide(1, np.power(r,6), out=np.zeros_like(r), where=r!=0))
 
