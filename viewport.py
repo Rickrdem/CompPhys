@@ -10,6 +10,11 @@ class Viewport(pyglet.window.Window):
         assert gamestate is not None
         super().__init__(resizable=True, vsync=False)
 
+        icon16 = pyglet.image.load("icon_bits16.png")
+        icon32 = pyglet.image.load("icon_bits32.png")
+        self.set_icon(icon16, icon32)
+        self.set_caption('Hexargon')
+
         platform = pyglet.window.get_platform()
         display = platform.get_default_display()
         screens = display.get_screens()
