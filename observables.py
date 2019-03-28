@@ -130,10 +130,9 @@ def specific_heat(game):
     c_v = 1/(2/(3*N)*(1-((a/b)-1)*3*N/2))
     return c_v
 
-    
-def bootstrap(observable):
-    n = 1000
-    random_set = np.random.choice(observable, size=n*len(observable)).reshape((len(observable), n))
-    set_of_averages = np.average(random_set, axis=0)
-    sigma = np.sqrt(np.average(np.square(set_of_averages))-np.square(np.average(set_of_averages)))
-    return sigma
+def bootstrap(data, function, n=100):
+    observables = []
+    for i in range(n):
+        resampled = np.random.choice(data, size=len(data), replace=True)
+        observables.append(function(resampled))
+    return np.std(observables)
