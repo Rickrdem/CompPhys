@@ -23,7 +23,19 @@ from dynamics import Dynamics
 from viewport import Viewport, setup
 import observables as obs
 
-def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False):
+import sys
+
+def progress(count, total, status=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('\r \r[%s] %s%s ...%s' % (bar, percents, '%', status))
+    sys.stdout.flush()
+
+def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False, headless=False):
     M = int(np.round(np.power(particles/4, 1/3.)))
     particles = 4*(M**3)
     if starting_state is None:
@@ -36,42 +48,61 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     
     simulation_state = Dynamics(state, T=temperature, size=(L, L, L), dtype=np.float64)
 
-    print('Simulation state created')
-    window = Viewport(simulation_state, drawevery=1)
-    
-    print('Windows created')
-    
-    pyglet.clock.schedule(simulation_state.update)
-    print('Starting app')
-    
-    print('------------------------------------------')   
-    print("""
-        Particles {particles}
-        Boxsize {boxsize:.2f}
-        Temperature {temp:.2f}
-        Density {dens:.2f}
-        """.format(particles=simulation_state.particles,
-                   boxsize=simulation_state.size[0],
-                   temp=simulation_state.T,
-                   dens=simulation_state.density))
-    
-    setup()
-    pyglet.app.run()
+    if not headless:
+        print('Simulation state created')
+        window = Viewport(simulation_state, drawevery=1)
 
-    pyglet.clock.unschedule(simulation_state.update)
+        print('Windows created')
+
+        pyglet.clock.schedule(simulation_state.update)
+        print('Starting app')
+
+        print('------------------------------------------')
+        print("""
+            Particles {particles}
+            Boxsize {boxsize:.2f}
+            Temperature {temp:.2f}
+            Density {dens:.2f}
+            """.format(particles=simulation_state.particles,
+                       boxsize=simulation_state.size[0],
+                       temp=simulation_state.T,
+                       dens=simulation_state.density))
+
+        setup()
+        pyglet.app.run()
+
+        pyglet.clock.unschedule(simulation_state.update)
+    else:
+        print("Booting headless")
+        iterations = 300+1200  # same configuration as in the Verlet paper
+        for i in range(iterations):
+            simulation_state.update(None)
+            progress(i, iterations)
+        print("Done")
     
     if plotting:
         # In the first couple of iterations the system is equilibriating.
         simulation_state = obs.trim_data(simulation_state, 300)  # remove the first 300 time steps see Verlet et.al.
-        obs.velocity_distribution(simulation_state)
-        obs.energy(simulation_state)
-        obs.diffusion(simulation_state)
-        obs.pair_correlation(simulation_state, fig_combined_pc, ax_combined_pc)
-        obs.temperature(simulation_state)
+        obs.plot_velocity_distribution(simulation_state)
+        obs.plot_energy(simulation_state)
+        obs.plot_diffusion(simulation_state)
+        obs.plot_pair_correlation(simulation_state, fig_combined_pc, ax_combined_pc)
+        obs.plot_temperature(simulation_state)
         plt.show()
+    velocity_magnitudes = func.abs(simulation_state.velocities)
     print("""
-    Specific heat {c_v:.2f}
-    """.format(c_v=obs.specific_heat(simulation_state)))
+    Energy {E:.2f} +- {E_err:.2f}
+    Temperature {T:.2f} +- {T_err:.2f}
+    Specific heat {c_v:.2f} +- {c_v_err:.20f}
+    """.format(
+        E=obs.energy(velocity_magnitudes),
+        E_err=obs.bootstrap(velocity_magnitudes, obs.energy),
+        T=obs.temperature(velocity_magnitudes),
+        T_err=obs.bootstrap(velocity_magnitudes, obs.temperature),
+        c_v=obs.specific_heat(velocity_magnitudes),
+        c_v_err=obs.bootstrap(velocity_magnitudes, obs.specific_heat)
+    )
+    )
 
     print('------------------------------------------')
     
@@ -79,7 +110,7 @@ if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(temperature=3, density=.3, particles=800, plotting=True)
+    main(temperature=3, density=.3, particles=100, plotting=True, headless=True)
 
     
     """Excersise"""

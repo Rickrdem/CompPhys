@@ -1,5 +1,6 @@
 import numpy as np
 import functions as func
+import observables as obs
 
 class Dynamics():
     """Molecular dynamics integrator.
@@ -56,7 +57,7 @@ class Dynamics():
 
 
     def update(self, a):
-        """ Updates the gamestate
+        """ Updates the dynamic state
 
         Moves all the particles around
         """
@@ -69,19 +70,20 @@ class Dynamics():
             if abs(self.T - self.measured_temperature) < 0.001:
                 self.thermostat = False
 
-        if abs(self.T - self.measured_temperature) > 0.15:
-            self.thermostat = True
+        # if abs(self.T - self.measured_temperature) > 0.15:
             
         self.positions_update()
         self.distances_update()
         self.forces_update()
         self.velocities_update()  # seconds half
 
-        self.measured_temperature = np.average(np.square(self.velocities))
+        # self.measured_temperature = np.average(np.square(self.velocities))
+        self.measured_temperature = obs.temperature(func.abs(self.velocities))
+        # self.measured_temperature = obs.temperature(self.velocities)
 
         self.positions[:, :] %= np.asarray(self.size)[np.newaxis, :]
 
-        self.kinetic_energy.append(np.sum(1 / 2 * np.square(self.velocities)))
+        self.kinetic_energy.append(obs.energy(func.abs(self.velocities)))
         self.potential_energy.append(func.sum_potential_jit(self.distances))
         self.diffusion.append(np.average(np.square((self.positions_not_bounded - self.original_positions))))
         self.temperature.append(self.measured_temperature)

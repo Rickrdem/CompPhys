@@ -24,7 +24,21 @@ def trim_data(simulation_state, start, end=None):
     return simulation_state
 
 
-def energy(simulation_state):
+def energy(velocity_magnitudes):
+    return np.sum(1 / 2 * np.square(velocity_magnitudes))
+
+def temperature(velocity_magnitudes):
+    particles = velocity_magnitudes.shape[0]
+    return energy(velocity_magnitudes)*2/3/(particles-1)
+
+def specific_heat(velocity_magnitudes):
+    E = energy(velocity_magnitudes)
+    particles = velocity_magnitudes.shape[0]
+    first_moment = np.average(E)
+    second_moment = np.average(E**2)
+    return 1/(1+2/(3*particles)-(second_moment/(first_moment**2)))
+
+def plot_energy(simulation_state):
     """Timetrace of the energy in the system. Kinetic energy, potential enery 
     and the sum of those is displayed"""
     fig, ax = plt.subplots()
@@ -56,7 +70,7 @@ def energy(simulation_state):
     fig.show()
 
 
-def velocity_distribution(game):
+def plot_velocity_distribution(game):
     """Histogram of velicity distribution overlayed with a maxwell-boltzmann pfd fit"""
     fig, ax = plt.subplots()
 
@@ -82,7 +96,7 @@ def velocity_distribution(game):
     fig.show()
 
 
-def diffusion(simulation_state):
+def plot_diffusion(simulation_state):
     """Timetrace of the diffusion in the system."""
     fig, ax = plt.subplots()
     time = np.arange(0, simulation_state.h * len(simulation_state.diffusion), simulation_state.h)
@@ -100,7 +114,7 @@ def diffusion(simulation_state):
     fig.show()
 
 
-def pair_correlation(simulation_state, fig=None, ax=None):
+def plot_pair_correlation(simulation_state, fig=None, ax=None):
     """Plot of the pair correlation function"""
     dr = 1 / simulation_state.particles ** (1 / 2)
     radius = np.arange(0.4, simulation_state.size[0], dr)
@@ -125,7 +139,7 @@ def pair_correlation(simulation_state, fig=None, ax=None):
     fig.show()
 
 
-def temperature(simulation_state):
+def plot_temperature(simulation_state):
     """Timetrace of the temperature of the system."""
     time = np.arange(0, simulation_state.h * len(simulation_state.kinetic_energy), simulation_state.h)
     temp = np.array(simulation_state.temperature)
@@ -164,7 +178,7 @@ def temperature(simulation_state):
     fig.show()
 
 
-def specific_heat(simulation_state):
+def plot_specific_heat(simulation_state):
     """Calculate specific heat of the stystem"""
     K = np.array(simulation_state.kinetic_energy)
     N = simulation_state.particles
