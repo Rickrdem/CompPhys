@@ -60,9 +60,14 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
 
     pyglet.clock.unschedule(simulation_state.update)
     
-    if plotting:
+    start = 60
+    if len(simulation_state.kinetic_energy) <= start:
+        print("Equilibrium was not reached yet, try again.")
+        return
+    
+    elif plotting:
         # In the first couple of iterations the system is equilibriating.
-        simulation_state = obs.trim_data(simulation_state, 300)  # remove the first 300 time steps see Verlet et.al.
+        simulation_state = obs.trim_data(simulation_state, start)  # remove the first 300 time steps see Verlet et.al.
         obs.velocity_distribution(simulation_state)
         obs.energy(simulation_state)
         obs.diffusion(simulation_state)
@@ -74,18 +79,16 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     Specific heat {c_v:.2f} +- {std:.4f}
     """.format(c_v=C_V, std= std_C_V))
 
-    print('------------------------------------------')
     
 if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots() # Used to plot (multiple) PCF's
 
-    main(temperature=0.5, density=1.2, particles=864, plotting=True)
-
+    main(temperature=0.5, density=1.2, particles=800, plotting=True)
     
     """Excersise"""
 #    main(temperature=0.5, density=1.2, particles=864, plotting=True)
 #    main(temperature=1, density=0.8, particles=864, plotting=True)
 #    main(temperature=3, density=0.3, particles=864, plotting=True)
-
+    print('------------------------------------------')
     print("Done!")
