@@ -5,6 +5,22 @@ import scipy.stats as stats
 
 import functions as func
 
+def trim_data(simulation_state, start, end=None):
+    """
+    Trim the data to remove a set of time steps.
+
+    :param simulation_state: The state to trim in time
+    :param start: The number of states to trim off of the front of the dataset.
+    :param end: The number of states to trim off of the back of the dataset.
+    :return: Trimmed simulation state.
+    """
+    simulation_state.kinetic_energy = simulation_state.kinetic_energy[start:end]
+    simulation_state.potential_energy = simulation_state.potential_energy[start:end]
+    simulation_state.diffusion = simulation_state.diffusion[start:end]
+    simulation_state.temperature = simulation_state.temperature[start:end]
+    simulation_state.set_temperature = simulation_state.set_temperature[start:end]
+
+    return simulation_state
 
 def energy(simulation_state):
     """Timetrace of the energy in the system. Kinetic energy, potential enery 
@@ -42,10 +58,13 @@ def velocity_distribution(game):
     fig, ax = plt.subplots()
 
     velocities = func.abs(game.velocities)
+
+
         
-    y, bin_edges = np.histogram(velocities, bins=int(np.sqrt(len(velocities))), density=True)
+    y, bin_edges = np.histogram(velocities, bins=int(np.sqrt(len(velocities))), density=False)
+    N = game.positions.shape[0] * (bin_edges[1]-bin_edges[0])
     bincenters = 0.5*(bin_edges[1:] + bin_edges[:-1])
-    menStd     = np.sqrt(y)/np.sum(y)
+    menStd     = np.sqrt(y)
     width      = np.max(velocities)/int(np.sqrt(len(velocities)))
     ax.bar(bincenters, y, width=width, color='b', yerr=menStd)
     
@@ -53,10 +72,10 @@ def velocity_distribution(game):
     params = maxwell.fit(velocities, floc=0)
     mean, var = maxwell.stats(*params, moments='mv')
     x = np.linspace(0, np.max(velocities), 100)
-    ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
+    ax.plot(x, maxwell.pdf(x, *params)*N, color='black', lw=3)
     
     ax.set_xlabel("Velocity")
-    ax.set_ylabel("#/N")
+    ax.set_ylabel("N")
     ax.set_title(r"$\mu$={m:.2f}, $\sigma$={s:.3f}".format(m=mean, s=var*.5))
     fig.tight_layout()
     fig.show()
