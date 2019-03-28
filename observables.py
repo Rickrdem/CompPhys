@@ -28,6 +28,9 @@ def energy(velocity_magnitudes):
     return np.sum(1 / 2 * np.square(velocity_magnitudes))
 
 def temperature(velocity_magnitudes):
+    """
+    Calculate the temperature assuming a boltzmann distribution of velocities.
+    """
     particles = velocity_magnitudes.shape[0]
     return np.sum(velocity_magnitudes**2)/(3*particles)
 
