@@ -24,6 +24,8 @@ from viewport import Viewport, setup
 import observables as obs
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False):
+    M = int(np.round(np.power(particles/4, 1/3.)))
+    particles = 4*(M**3)
     if starting_state is None:
         L = np.power(particles/density, 1/3)
         lattice_constant = L*np.power(4/particles, 1/3)
@@ -59,6 +61,8 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     pyglet.clock.unschedule(simulation_state.update)
     
     if plotting:
+        # In the first couple of iterations the system is equilibriating.
+        simulation_state = obs.trim_data(simulation_state, 300)  # remove the first 300 time steps see Verlet et.al.
         obs.velocity_distribution(simulation_state)
         obs.energy(simulation_state)
         obs.diffusion(simulation_state)
@@ -75,7 +79,7 @@ if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(temperature=1, density=0.8, particles=864, plotting=True)
+    main(temperature=3, density=.3, particles=800, plotting=True)
 
     
     """Excersise"""
