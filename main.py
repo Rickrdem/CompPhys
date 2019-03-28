@@ -69,9 +69,10 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         obs.pair_correlation(simulation_state, fig_combined_pc, ax_combined_pc)
         obs.temperature(simulation_state)
         plt.show()
+    C_V, std_C_V = obs.specific_heat(simulation_state)
     print("""
-    Specific heat {c_v:.2f}
-    """.format(c_v=obs.specific_heat(simulation_state)))
+    Specific heat {c_v:.2f} +- {std:.4f}
+    """.format(c_v=C_V, std= std_C_V))
 
     print('------------------------------------------')
     
