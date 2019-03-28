@@ -70,14 +70,14 @@ def plot_energy(simulation_state):
     fig.show()
 
 
-def plot_velocity_distribution(game):
+def plot_velocity_distribution(simulation_state):
     """Histogram of velicity distribution overlayed with a maxwell-boltzmann pfd fit"""
     fig, ax = plt.subplots()
 
-    velocities = func.abs(game.velocities)
+    velocities = func.abs(simulation_state.velocities)
 
     y, bin_edges = np.histogram(velocities, bins=int(np.sqrt(len(velocities))), density=False)
-    N = game.positions.shape[0] * (bin_edges[1] - bin_edges[0])
+    N = simulation_state.positions.shape[0] * (bin_edges[1] - bin_edges[0])
     bincenters = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     menStd = np.sqrt(y)
     width = np.max(velocities) / int(np.sqrt(len(velocities)))
@@ -185,8 +185,15 @@ def plot_specific_heat(simulation_state):
     a = np.average(np.square(K))
     b = np.square(np.average(K))
 
-    c_v = 1 / (2 / (3 * N) * (1 - ((a / b) - 1) * 3 * N / 2))
-    return c_v
+    std_a = bootstrap(np.square(K), np.average)
+    std_b = abs(2*bootstrap(K, np.average))
+            
+    std_a_over_b = abs(a/b)*np.sqrt((std_a/a)**2+(std_b/b)**2)
+    
+    std = std_a_over_b
+    
+    c_v = 1 / (1 + 2/(3*N) - a/b)
+    return c_v, std
 
 
 def bootstrap(data, function, n=100):

@@ -37,7 +37,7 @@ def progress(count, total, status=''):
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False, headless=False):
     M = int(np.round(np.power(particles/4, 1/3.)))
-    particles = 4*(M**3)
+    particles = 4*(M**3) # Number of particles that fit in a fcc
     if starting_state is None:
         L = np.power(particles/density, 1/3)
         lattice_constant = L*np.power(4/particles, 1/3)
@@ -80,7 +80,12 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
             progress(i, iterations)
         print("Done")
     
-    if plotting:
+    start = 60
+    if len(simulation_state.kinetic_energy) <= start:
+        print("Equilibrium was not reached yet, try again.")
+        return
+    
+    elif plotting:
         # In the first couple of iterations the system is equilibriating.
         simulation_state = obs.trim_data(simulation_state, 300)  # remove the first 300 time steps see Verlet et.al.
         obs.plot_velocity_distribution(simulation_state)
@@ -104,7 +109,6 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     )
     )
 
-    print('------------------------------------------')
     
 if __name__ == '__main__':
     plt.close('all')
@@ -112,10 +116,11 @@ if __name__ == '__main__':
 
     main(temperature=3, density=.3, particles=100, plotting=True, headless=True)
 
+    main(temperature=0.5, density=1.2, particles=800, plotting=True)
     
     """Excersise"""
 #    main(temperature=0.5, density=1.2, particles=864, plotting=True)
 #    main(temperature=1, density=0.8, particles=864, plotting=True)
 #    main(temperature=3, density=0.3, particles=864, plotting=True)
-
+    print('------------------------------------------')
     print("Done!")
