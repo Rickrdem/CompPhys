@@ -25,7 +25,7 @@ import observables as obs
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False):
     M = int(np.round(np.power(particles/4, 1/3.)))
-    particles = 4*(M**3)
+    particles = 4*(M**3) # Number of particles that fit in a fcc
     if starting_state is None:
         L = np.power(particles/density, 1/3)
         lattice_constant = L*np.power(4/particles, 1/3)
@@ -77,9 +77,9 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     
 if __name__ == '__main__':
     plt.close('all')
-    fig_combined_pc, ax_combined_pc = plt.subplots()
+    fig_combined_pc, ax_combined_pc = plt.subplots() # Used to plot (multiple) PCF's
 
-    main(temperature=3, density=.3, particles=800, plotting=True)
+    main(temperature=0.5, density=1.2, particles=864, plotting=True)
 
     
     """Excersise"""
