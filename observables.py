@@ -43,17 +43,17 @@ def velocity_distribution(game):
 
     velocities = func.abs(game.velocities)
         
-    y, bin_edges = np.histogram(velocities, bins=int(np.sqrt(len(velocities))), density=True)
+    y, bin_edges = np.histogram(velocities, bins=int(np.sqrt(len(velocities))))#, density=True)
     bincenters = 0.5*(bin_edges[1:] + bin_edges[:-1])
     menStd     = np.sqrt(y)/np.sum(y)
     width      = np.max(velocities)/int(np.sqrt(len(velocities)))
-    ax.bar(bincenters, y, width=width, color='b', yerr=menStd)
+    ax.bar(bincenters, y/np.sum(y), width=width, color='b', yerr=menStd)
     
     maxwell = stats.maxwell
     params = maxwell.fit(velocities, floc=0)
     mean, var = maxwell.stats(*params, moments='mv')
     x = np.linspace(0, np.max(velocities), 100)
-    ax.plot(x, maxwell.pdf(x, *params), color='black', lw=3)   
+    ax.plot(x, maxwell.pdf(x, *params)/np.sum(y), color='black', lw=3)   
     
     ax.set_xlabel("Velocity")
     ax.set_ylabel("#/N")
