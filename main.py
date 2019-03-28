@@ -10,6 +10,7 @@ The program consists of 5 files:
 and requires two images:
     icon_bits16.png
     icon_bits32.png
+The program is started by running main.py. 
 @author: Lennard Kwakernaak
 @author: Rick Rodrigues de Mercado
 """
@@ -36,6 +37,14 @@ def progress(count, total, status=''):
     sys.stdout.flush()
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False, headless=False):
+    """
+    :param temperature (float): Temperature of the system
+    :param density (float): Density of the system
+    :param particles (int): number of particles in the box
+    :param starting_state gives (NxM array): specific state, default is fcc
+    :param plotting (bool): the turn on/off the plots
+    :param headless (bool): run without visualization    
+    """
     M = int(np.round(np.power(particles/4, 1/3.)))
     particles = 4*(M**3) # Number of particles that fit in a fcc
     if starting_state is None:
@@ -116,11 +125,11 @@ if __name__ == '__main__':
 
     main(temperature=3, density=.3, particles=100, plotting=True, headless=True)
 
-    main(temperature=0.5, density=1.2, particles=800, plotting=True)
+#    main(temperature=0.5, density=1.2, particles=800, plotting=True)
     
     """Excersise"""
-#    main(temperature=0.5, density=1.2, particles=864, plotting=True)
-#    main(temperature=1, density=0.8, particles=864, plotting=True)
-#    main(temperature=3, density=0.3, particles=864, plotting=True)
+#    main(temperature=0.5, density=1.2, particles=864, plotting=True, headless=True)
+#    main(temperature=1, density=0.8, particles=864, plotting=True, headless=True)
+#    main(temperature=3, density=0.3, particles=864, plotting=True, headless=True)
     print('------------------------------------------')
     print("Done!")
