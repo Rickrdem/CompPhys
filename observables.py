@@ -34,9 +34,11 @@ def temperature(velocity_magnitudes):
 def specific_heat(velocity_magnitudes):
     E = energy(velocity_magnitudes)
     particles = velocity_magnitudes.shape[0]
+    print(velocity_magnitudes.shape)
+    print(np.std(velocity_magnitudes))
     first_moment = np.average(E)
     second_moment = np.average(E**2)
-    return 1/(1+2/(3*particles)-(second_moment/(first_moment**2)))
+    return 1/(1+2/(3*particles)-(second_moment/(first_moment**2)))/particles
 
 def plot_energy(simulation_state):
     """Timetrace of the energy in the system. Kinetic energy, potential enery 
