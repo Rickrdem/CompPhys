@@ -171,8 +171,15 @@ def specific_heat(simulation_state):
     a = np.average(np.square(K))
     b = np.square(np.average(K))
 
-    c_v = 1 / (2 / (3 * N) * (1 - ((a / b) - 1) * 3 * N / 2))
-    return c_v
+    std_a = bootstrap(np.square(K), np.average)
+    std_b = abs(2*bootstrap(K, np.average))
+            
+    std_a_over_b = abs(a/b)*np.sqrt((std_a/a)**2+(std_b/b)**2)
+    
+    std = std_a_over_b
+    
+    c_v = 1 / (1 + 2/(3*N) - a/b)
+    return c_v, std
 
 
 def bootstrap(data, function, n=100):
