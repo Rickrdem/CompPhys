@@ -201,7 +201,7 @@ def plot_specific_heat(simulation_state):
     
     std = std_a_over_b
     
-    c_v = 1 / (1 + 2/(3*N) - a/b)
+    c_v = 1 / (1 + 2/(3*N) - a/b) / N
     return c_v, std
 
 
