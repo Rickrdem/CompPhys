@@ -29,37 +29,10 @@ def energy(velocity_magnitudes):
 
 def temperature(velocity_magnitudes):
     """
-    Calculate the temperature assuming a boltzmann distribution of velocities.
+    Calculate the temperature using equipartition theorem.
     """
     particles = velocity_magnitudes.shape[0]
     return np.sum(velocity_magnitudes**2)/(3*particles)
-
-def specific_heat(kinetic_energy, particles):
-    first_moment = np.average(kinetic_energy)
-    second_moment = np.average(np.square(kinetic_energy))
-    std = np.std(kinetic_energy)
-    k = first_moment/(np.square(second_moment))
-    std_k = np.sqrt(second_moment - first_moment**2)
-
-    dk_k = np.var(kinetic_energy)#/(first_moment**2)
-
-
-    print(k, std,std_k, particles, dk_k)
-    print(1/(2/(3*particles) - dk_k) - 3/2)
-    return 1/(2/(3*particles) + 1 - k)
-# def specific_heat(velocity_magnitudes):
-#     """
-#     Calculate the specific heat capacity per mass element.
-#     :return: Specific heat capacity.
-#     """
-#     particles = velocity_magnitudes.shape[0]
-#     K = 1/2*np.square(velocity_magnitudes)
-#     first_moment = np.average(K)
-#     second_moment = np.average(K**2)
-#     k = second_moment/(first_moment**2)
-#
-#     print(k)
-#     return particles / (particles*(1-k) + 2/3)
 
 def plot_energy(simulation_state):
     """Timetrace of the energy in the system. Kinetic energy, potential enery 
@@ -72,19 +45,19 @@ def plot_energy(simulation_state):
     ax.plot(time, total_energy, c='black', label='$E_t$')
 
     kinetic_average = np.average(simulation_state.kinetic_energy)
-    kinetic_sigma = bootstrap(simulation_state.kinetic_energy, np.average)
+    kinetic_err = bootstrap(simulation_state.kinetic_energy, np.average)
     potential_average = np.average(simulation_state.potential_energy)
-    potential_sigma = bootstrap(simulation_state.potential_energy, np.average)
+    potential_err = bootstrap(simulation_state.potential_energy, np.average)
     tot_average = np.average(total_energy)
-    tot_sigma = bootstrap(total_energy, np.average)
+    tot_err = bootstrap(total_energy, np.average)
 
     ax.set_title(r"""$\mu(E_k, E_p, E_t)$ = ({a:.1f}, {b:.1f}, {c:.1f}),
-                 $\sigma(E_k, E_p, E_t)$ = ({d:.1f}, {e:.1f}, {f:.1f})""".format(a=kinetic_average,
+                 err$(E_k, E_p, E_t)$ = ({d:.1f}, {e:.1f}, {f:.1f})""".format(a=kinetic_average,
                                                                                  b=potential_average,
                                                                                  c=tot_average,
-                                                                                 d=kinetic_sigma,
-                                                                                 e=potential_sigma,
-                                                                                 f=tot_sigma))
+                                                                                 d=kinetic_err,
+                                                                                 e=potential_err,
+                                                                                 f=tot_err))
 
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$E/\epsilon$")
@@ -131,7 +104,7 @@ def plot_diffusion(simulation_state):
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$<(r(t)-r(0))^2>$")
     ax.set_title(
-        "Linear fit: y=ax+b; a={a:.4f}$\pm$ {std:.4f}, b={b:.3f}".format(a=p[0], std=np.sqrt(cov[0, 0]), b=p[1]))
+        "Linear fit: y=ax+b; a={a:.5f}$\pm$ {std:.5f}, b={b:.4f}".format(a=p[0], std=np.sqrt(cov[0, 0]), b=p[1]))
     ax.legend()
     fig.tight_layout()
     fig.show()
@@ -189,11 +162,15 @@ def plot_temperature(simulation_state):
 
     ax2.plot(y, bins, 'r--', linewidth=2, label='pdf')
 
+    err = bootstrap(temp, np.average)
+
     ax.set_xlabel(r"$t/\tau$")
     ax.set_ylabel(r"$T$")
     ax2.set_xlabel("Probability density")
 
-    ax2.set_title("$\mu$={m:.2f}, $\sigma$={s:.3f}".format(m=mu, s=sigma))
+    ax2.set_title("$\mu$={m:.2f}, $\sigma$={s:.3f}, err={e:.4f}".format(m=mu, 
+                                                                      s=sigma,
+                                                                      e=err))
     plt.setp(ax2.get_yticklabels(), visible=False)
 
     ax.legend()
@@ -201,7 +178,7 @@ def plot_temperature(simulation_state):
     fig.show()
 
 
-def plot_specific_heat(simulation_state):
+def specific_heat(simulation_state):
     """Calculate specific heat of the stystem"""
     K = np.array(simulation_state.kinetic_energy)
     N = simulation_state.particles
