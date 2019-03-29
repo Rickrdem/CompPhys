@@ -51,8 +51,8 @@ def plot_energy(simulation_state):
     tot_average = np.average(total_energy)
     tot_err = bootstrap(total_energy, np.average)
 
-    ax.set_title(r"""$\mu(E_k, E_p, E_t)$ = ({a:.1f}, {b:.1f}, {c:.1f}),
-                 err$(E_k, E_p, E_t)$ = ({d:.1f}, {e:.1f}, {f:.1f})""".format(a=kinetic_average,
+    ax.set_title(r"""$\mu(E_k, E_p, E_t)$ = ({a:.2f}, {b:.2f}, {c:.2f}),
+                 err$(E_k, E_p, E_t)$ = ({d:.2f}, {e:.2f}, {f:.2f})""".format(a=kinetic_average,
                                                                                  b=potential_average,
                                                                                  c=tot_average,
                                                                                  d=kinetic_err,
