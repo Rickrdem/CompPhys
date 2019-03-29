@@ -41,12 +41,15 @@ def progress(count, total, status=''):
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False, headless=False):
     """
+    Start the molecular dynamics simulation.
+    
     :param temperature (float): Temperature of the system
     :param density (float): Density of the system
     :param particles (int): number of particles in the box
     :param starting_state gives (NxM array): specific state, default is fcc
     :param plotting (bool): the turn on/off the plots
-    :param headless (bool): run without visualization    
+    :param headless (bool): run without visualization. If headles is True, the 
+                            simulation runs for 1200 steps    .
     """
     M = int(np.round(np.power(particles/4, 1/3.)))
     particles = 4*(M**3) # Mach number of particles to fcc
