@@ -34,18 +34,32 @@ def temperature(velocity_magnitudes):
     particles = velocity_magnitudes.shape[0]
     return np.sum(velocity_magnitudes**2)/(3*particles)
 
-def specific_heat(velocity_magnitudes):
-    """
-    Calculate the specific heat capacity per mass element.
-    :return: Specific heat capacity.
-    """
-    particles = velocity_magnitudes.shape[0]
-    K = 1/2*np.square(velocity_magnitudes)
-    first_moment = np.sum(K)
-    second_moment = np.sum(K**2)
-    k = second_moment/(first_moment**2)
+def specific_heat(kinetic_energy, particles):
+    first_moment = np.average(kinetic_energy)
+    second_moment = np.average(np.square(kinetic_energy))
+    std = np.std(kinetic_energy)
+    k = first_moment/(np.square(second_moment))
+    std_k = np.sqrt(second_moment - first_moment**2)
 
-    return particles / (particles*(1-k) + 2/3)
+    dk_k = np.var(kinetic_energy)#/(first_moment**2)
+
+
+    print(k, std,std_k, particles, dk_k)
+    print(1/(2/(3*particles) - dk_k) - 3/2)
+    return 1/(2/(3*particles) + 1 - k)
+# def specific_heat(velocity_magnitudes):
+#     """
+#     Calculate the specific heat capacity per mass element.
+#     :return: Specific heat capacity.
+#     """
+#     particles = velocity_magnitudes.shape[0]
+#     K = 1/2*np.square(velocity_magnitudes)
+#     first_moment = np.average(K)
+#     second_moment = np.average(K**2)
+#     k = second_moment/(first_moment**2)
+#
+#     print(k)
+#     return particles / (particles*(1-k) + 2/3)
 
 def plot_energy(simulation_state):
     """Timetrace of the energy in the system. Kinetic energy, potential enery 
