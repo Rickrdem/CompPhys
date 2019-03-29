@@ -79,7 +79,7 @@ def sum_potential_jit(r):
             if square != 0:
                 sixth = square**3
                 twelvth = sixth**2
-                Total_U += 4 * (1 /twelvth - 1 /sixth) # factor 2 because of double counting
+                Total_U += 4 * (1 /twelvth - 1 /sixth)
     return Total_U
 
 @numba.njit()
