@@ -66,27 +66,20 @@ def sum_potential_jit(r):
     """
     particles = r.shape[0]
     dimensions = r.shape[2]
-    U = np.empty((particles, particles, dimensions))
+    # U = np.empty((particles, particles, dimensions))
     Total_U = 0
     for i in range(particles):
-        for k in range(dimensions):
-            U[i, i, k] = 0
-        for j in range(1, particles):
-            m = 0  # magnitude of the vector
+        for j in range(i+1, particles):
+            square = 0  # magnitude squared of the vector
 
             for k in range(dimensions):
-                m += r[i, j, k] * r[i, j, k]
-            m = np.sqrt(m)
+                square += r[i, j, k] * r[i, j, k]
 
-            for k in range(dimensions):
-                if m == 0:
-                    U[i, j, k] = 0
-                else:
-                    U[i, j, k] =  4 * (
-                                1 / (m * m * m * m * m * m * m * m * m * m * m * m)  # absolutely ridiculous performance increase
-                                - 1 / (m * m * m * m * m * m))
-                U[j, i, k] = -U[i, j, k]
-                Total_U += U[i, j, k]
+            # for k in range(dimensions):
+            if square != 0:
+                sixth = square**3
+                twelvth = sixth**2
+                Total_U += 4 * (1 /twelvth - 1 /sixth) # factor 2 because of double counting
     return Total_U
 
 @numba.njit()
