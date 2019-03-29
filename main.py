@@ -82,7 +82,18 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
 
         pyglet.clock.unschedule(simulation_state.update)
     else:
+        print('------------------------------------------')
         print("Booting headless")
+        print("""
+            Particles {particles}
+            Boxsize {boxsize:.2f}
+            Temperature {temp:.2f}
+            Density {dens:.2f}
+            """.format(particles=simulation_state.particles,
+                       boxsize=simulation_state.size[0],
+                       temp=simulation_state.T,
+                       dens=simulation_state.density))
+
         iterations = 300+1200  # same configuration as in the Verlet paper
         for i in range(iterations):
             simulation_state.update(None)
@@ -125,7 +136,6 @@ if __name__ == '__main__':
 
     main(temperature=3, density=.3, particles=100, plotting=True, headless=True)
 
-#    main(temperature=0.5, density=1.2, particles=800, plotting=True)
     
     """Excersise"""
 #    main(temperature=0.5, density=1.2, particles=864, plotting=True, headless=True)
