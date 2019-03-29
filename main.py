@@ -114,8 +114,9 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         obs.plot_pair_correlation(simulation_state, fig_combined_pc, ax_combined_pc)
         obs.plot_temperature(simulation_state)
         plt.show()
+    
     velocity_magnitudes = func.abs(simulation_state.velocities)
-    C_V , std_C_V = obs.plot_specific_heat(simulation_state)
+    C_V , err_C_V = obs.specific_heat(simulation_state)
     print("""
     Energy {E:.2f} +- {E_err:.2f}
     Temperature {T:.2f} +- {T_err:.2f}
@@ -126,7 +127,7 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         T=obs.temperature(velocity_magnitudes),
         T_err=obs.bootstrap(velocity_magnitudes, obs.temperature),
         c_v=C_V,
-        c_v_err=std_C_V
+        c_v_err=err_C_V
     )
     )
     
@@ -134,7 +135,7 @@ if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots()
 
-    main(temperature=1, density=.8, particles=100, plotting=True, headless=True)
+    main(temperature=1, density=.8, particles=800, plotting=True, headless=True)
 
     
     """Excersise"""
