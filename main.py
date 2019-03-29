@@ -19,14 +19,17 @@ import numpy as np
 import functions as func
 import matplotlib.pyplot as plt
 import pyglet
+import sys
 
 from dynamics import Dynamics
 from viewport import Viewport, setup
 import observables as obs
 
-import sys
 
 def progress(count, total, status=''):
+    """
+    Plot a loading bar while running a headless simulation
+    """
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
 
@@ -46,7 +49,7 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     :param headless (bool): run without visualization    
     """
     M = int(np.round(np.power(particles/4, 1/3.)))
-    particles = 4*(M**3) # Number of particles that fit in a fcc
+    particles = 4*(M**3) # Mach number of particles to fcc
     if starting_state is None:
         L = np.power(particles/density, 1/3)
         lattice_constant = L*np.power(4/particles, 1/3)
@@ -103,11 +106,14 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     start = 300
     if len(simulation_state.kinetic_energy) <= start:
         print("Equilibrium was not reached yet, try again.")
+        plt.close("all")
         return
     
     elif plotting:
         # In the first couple of iterations the system is equilibriating.
-        simulation_state = obs.trim_data(simulation_state, start)  # remove the first 300 time steps see Verlet et.al.
+        # remove the first 300 time steps see Verlet et.al.
+        simulation_state = obs.trim_data(simulation_state, start)  
+        
         obs.plot_velocity_distribution(simulation_state)
         obs.plot_energy(simulation_state)
         obs.plot_diffusion(simulation_state)
@@ -117,18 +123,16 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     
     C_V , err_C_V = obs.specific_heat(simulation_state)
     print("""
-        Specific heat {c_v:.5f} +- {c_v_err:.5f}
-        """.format(
-            c_v=C_V,
-            c_v_err=err_C_V
-        )
-        )
+            Specific heat {c_v:.5f} +- {c_v_err:.5f}
+            """.format(
+                c_v=C_V,
+                c_v_err=err_C_V))
     
 if __name__ == '__main__':
     plt.close('all')
-    fig_combined_pc, ax_combined_pc = plt.subplots() #used to plot PCF
+    fig_combined_pc, ax_combined_pc = plt.subplots() # Used to plot PCF
 
-    main(temperature=1, density=.8, particles=300, plotting=True, headless=False)
+    main(temperature=1, density=.8, particles=864, plotting=True, headless=False)
 
     
     """Excersise"""

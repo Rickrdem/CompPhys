@@ -1,3 +1,8 @@
+"""
+@author: Lennard Kwakernaak
+@author: Rick Rodrigues de Mercado
+"""
+
 import numpy as np
 import numba
 from itertools import product
@@ -18,7 +23,6 @@ def distance_jit(positions, boxsize):
         for k in range(dimensions):
             distances[i, i, k] = 0
             for j in range(i+1,particles):
-                # d = ((positions[i,k] - positions[j,k] + L[k]/2) % L[k]) - L[k]/2
                 d = positions[i,k] - positions[j,k]
                 if d<-L[k]/2.:
                     d = d+L[k]
@@ -52,7 +56,8 @@ def fcc_lattice(boxsize, a=1, dim=3):
     
     fcc = np.concatenate((sc1, sc2, sc3, sc4))
     
-    mask = np.where(np.all((fcc>=boxsize)==False, axis=1)==False) #remove all positions>boxsize
+    #remove all positions>boxsize
+    mask = np.where(np.all((fcc>=boxsize)==False, axis=1)==False) 
     fcc = np.delete(fcc, mask, axis=0)
         
     return fcc
@@ -66,7 +71,6 @@ def sum_potential_jit(r):
     """
     particles = r.shape[0]
     dimensions = r.shape[2]
-    # U = np.empty((particles, particles, dimensions))
     Total_U = 0
     for i in range(particles):
         for j in range(i+1, particles):
@@ -75,11 +79,10 @@ def sum_potential_jit(r):
             for k in range(dimensions):
                 square += r[i, j, k] * r[i, j, k]
 
-            # for k in range(dimensions):
             if square != 0:
                 sixth = square**3
                 twelvth = sixth**2
-                Total_U += 4 * (1 /twelvth - 1 /sixth) # factor 2 because of double counting
+                Total_U += 4 * (1 /twelvth - 1 /sixth) 
     return Total_U
 
 @numba.njit()

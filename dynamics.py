@@ -1,9 +1,15 @@
+"""
+@author: Lennard Kwakernaak
+@author: Rick Rodrigues de Mercado
+"""
+
 import numpy as np
 import functions as func
 import observables as obs
 
 class Dynamics():
-    """Molecular dynamics integrator.
+    """
+    Molecular dynamics integrator.
 
     This class contains the methods required to simulate a molecular dynamics simulation.
     Typical usage is to initialise with a state and propagate that state with the update method.
@@ -46,18 +52,22 @@ class Dynamics():
         self.generate_state(state)
 
     def generate_state(self, state):
-        """ Loads up the original state and adds some noise in the velocities.
+        """ 
+        Loads up the original state and adds some noise in the velocities.
         """
         self.positions[:] = np.asarray(state, dtype=self.dtype).copy()
         self.original_positions = self.positions.copy()
         self.positions_not_bounded = state.copy()
         self.velocities[:] = np.random.normal(0, 0.1, size=(self.particles, self.dimensions))
-        self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None, :] #No net velocity in the system
+        
+        #No net velocity in the system
+        self.velocities[:] = self.velocities - np.average(self.velocities, axis=0)[None, :] 
+        
         self.measured_temperature = np.average(np.square(self.velocities))
 
-
     def update(self, a):
-        """ Updates the dynamic state
+        """ 
+        Updates the dynamic state
 
         Moves all the particles around
         """
@@ -70,8 +80,6 @@ class Dynamics():
             if abs(self.T - self.measured_temperature) < 0.001:
                 self.thermostat = False
 
-        # if abs(self.T - self.measured_temperature) > 0.15:
-            
         self.positions_update()
         self.distances_update()
         self.forces_update()
