@@ -128,16 +128,18 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
                 c_v=C_V,
                 c_v_err=err_C_V))
     
+    return simulation_state
+    
 if __name__ == '__main__':
     plt.close('all')
     fig_combined_pc, ax_combined_pc = plt.subplots() # Used to plot PCF
 
-    main(temperature=1, density=.8, particles=864, plotting=True, headless=False)
+    final_state = main(temperature=1, density=.8, particles=864, plotting=True, headless=False)
 
     
     """Excersise"""
-#    main(temperature=0.5, density=1.2, particles=864, plotting=True, headless=True)
-#    main(temperature=1, density=0.8, particles=864, plotting=True, headless=True)
-#    main(temperature=3, density=0.3, particles=864, plotting=True, headless=True)
+#    final_state_solid = main(temperature=0.5, density=1.2, particles=864, plotting=True, headless=True)
+#    final_state_liquid = main(temperature=1, density=0.8, particles=864, plotting=True, headless=True)
+#    final_state_solid =  main(temperature=3, density=0.3, particles=864, plotting=True, headless=True)
     print('------------------------------------------')
     print("Done!")
