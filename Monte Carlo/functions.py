@@ -33,7 +33,7 @@ def perturb(state, J, T):
     keep it with a chance defined by the acceptance probability
     See wikipedia on monte carlo ising simulation"""
     location = np.unravel_index(np.random.randint(state.size), state.shape)
-    microstate = state.take(window(location),mode='wrap')
+    microstate = state.take(window(location), mode='wrap')
     E = H(microstate, J)
     microstate[tuple(d//2 for d in microstate.shape)] *= -1
     dE = H(microstate, J) - E
