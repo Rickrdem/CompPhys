@@ -1,3 +1,7 @@
+"""
+@author: Lennard Kwakernaak
+@author: Rick Rodrigues de Mercado
+"""
 import pyglet
 import numpy as np
 from pyglet.gl.gl import *
@@ -81,8 +85,9 @@ class Viewport(pyglet.window.Window):
         """
         The method called every update of the screen.
 
-        The Event loop supplied by pyglet handles the calling of this method. This method will be called after
-        the update method and after a small pause that allows for user input.
+        The Event loop supplied by pyglet handles the calling of this method. 
+        This method will be called after the update method and after a small 
+        pause that allows for user input.
         """
         for i in range(self.drawevery-1):
             self.gamestate.update(0)  # calculate self.drawevery-1 extra states before rendering
@@ -119,14 +124,16 @@ class Viewport(pyglet.window.Window):
         """
         Puts all particles in the batch before rendering.
 
-        All particles are decorated with an icosahedron before being loaded into the vertex buffer. The color buffer
-        is filled in the first frame to show the initial starting positions of all vertices.
+        All particles are decorated with an icosahedron before being loaded 
+        into the vertex buffer. The color buffer is filled in the first frame 
+        to show the initial starting positions of all vertices.
         """
         gamestate = self.gamestate
         positions = (gamestate.positions - np.asarray(gamestate.size) / 2) / np.asarray(gamestate.size)[np.newaxis, :]
 
         verts, faces = icosahedron()  # The vertices and faces of a single icosahedron
 
+        # Scaling down size of ico to 0.36 sigma (vd Waals radius of argon)
         verts = 0.36* verts / gamestate.size[0]  # Scaling down size of ico to 1 sigma
 
         verts_per_shape = len(verts)
@@ -210,7 +217,6 @@ class Viewport(pyglet.window.Window):
 
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        # if buttons & self.mouse.LEFT:
         x, y = self.rotation
         x, y = x + dx / 5, y + dy / 5
         self.rotation = (x, y)
@@ -249,8 +255,7 @@ def setup():
     """ Basic OpenGL configuration.
     """
     # Set the color of "clear", i.e. the sky, in rgba.
-
-    glClearColor(0,0,0, 1)
+    glClearColor(0,0,0, 1) # Background colour
 
     # Enable culling (not rendering) of back-facing facets -- facets that aren't
     # visible to you.

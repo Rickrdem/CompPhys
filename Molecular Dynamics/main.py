@@ -19,14 +19,17 @@ import numpy as np
 import functions as func
 import matplotlib.pyplot as plt
 import pyglet
+import sys
 
 from dynamics import Dynamics
 from viewport import Viewport, setup
 import observables as obs
 
-import sys
 
 def progress(count, total, status=''):
+    """
+    Plot a loading bar while running a headless simulation
+    """
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
 
@@ -38,15 +41,18 @@ def progress(count, total, status=''):
 
 def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plotting=False, headless=False):
     """
+    Start the molecular dynamics simulation.
+    
     :param temperature (float): Temperature of the system
     :param density (float): Density of the system
     :param particles (int): number of particles in the box
     :param starting_state gives (NxM array): specific state, default is fcc
     :param plotting (bool): the turn on/off the plots
-    :param headless (bool): run without visualization    
+    :param headless (bool): run without visualization. If headles is True, the 
+                            simulation runs for 1200 steps    .
     """
     M = int(np.round(np.power(particles/4, 1/3.)))
-    particles = 4*(M**3) # Number of particles that fit in a fcc
+    particles = 4*(M**3) # Mach number of particles to fcc
     if starting_state is None:
         L = np.power(particles/density, 1/3)
         lattice_constant = L*np.power(4/particles, 1/3)
@@ -103,11 +109,14 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
     start = 300
     if len(simulation_state.kinetic_energy) <= start:
         print("Equilibrium was not reached yet, try again.")
+        plt.close("all")
         return
     
     elif plotting:
         # In the first couple of iterations the system is equilibriating.
-        simulation_state = obs.trim_data(simulation_state, start)  # remove the first 300 time steps see Verlet et.al.
+        # remove the first 300 time steps see Verlet et.al.
+        simulation_state = obs.trim_data(simulation_state, start)  
+        
         obs.plot_velocity_distribution(simulation_state)
         obs.plot_energy(simulation_state)
         obs.plot_diffusion(simulation_state)
@@ -115,32 +124,25 @@ def main(temperature=0.5, density=1.2, particles=256, starting_state=None, plott
         obs.plot_temperature(simulation_state)
         plt.show()
     
-    velocity_magnitudes = func.abs(simulation_state.velocities)
     C_V , err_C_V = obs.specific_heat(simulation_state)
     print("""
-    Energy {E:.2f} +- {E_err:.2f}
-    Temperature {T:.2f} +- {T_err:.2f}
-    Specific heat {c_v:.5f} +- {c_v_err:.5f}
-    """.format(
-        E=obs.energy(velocity_magnitudes),
-        E_err=obs.bootstrap(velocity_magnitudes, obs.energy),
-        T=obs.temperature(velocity_magnitudes),
-        T_err=obs.bootstrap(velocity_magnitudes, obs.temperature),
-        c_v=C_V,
-        c_v_err=err_C_V
-    )
-    )
+            Specific heat {c_v:.5f} +- {c_v_err:.5f}
+            """.format(
+                c_v=C_V,
+                c_v_err=err_C_V))
+    
+    return simulation_state
     
 if __name__ == '__main__':
     plt.close('all')
-    fig_combined_pc, ax_combined_pc = plt.subplots()
+    fig_combined_pc, ax_combined_pc = plt.subplots() # Used to plot PCF
 
-    main(temperature=1, density=.8, particles=800, plotting=True, headless=True)
+    final_state = main(temperature=1, density=.8, particles=864, plotting=True, headless=False)
 
     
     """Excersise"""
-#    main(temperature=0.5, density=1.2, particles=864, plotting=True, headless=True)
-#    main(temperature=1, density=0.8, particles=864, plotting=True, headless=True)
-#    main(temperature=3, density=0.3, particles=864, plotting=True, headless=True)
+#    final_state_solid = main(temperature=0.5, density=1.2, particles=864, plotting=True, headless=True)
+#    final_state_liquid = main(temperature=1, density=0.8, particles=864, plotting=True, headless=True)
+#    final_state_solid =  main(temperature=3, density=0.3, particles=864, plotting=True, headless=True)
     print('------------------------------------------')
     print("Done!")
