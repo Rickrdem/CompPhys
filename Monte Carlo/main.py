@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+# import matplotlib.animation as animation
 
 import observables as obs
 from dynamics import Dynamics
+from viewer import Viewer
 
 
 if __name__ == "__main__":
@@ -11,15 +12,17 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots()
     
-    J = -10000
+    J = 1
     T = 1
     
     simulation_state = Dynamics(J, T, fig, ax)
             
     # pass a generator in "emitter" to produce data for the update func
-    ani = animation.FuncAnimation(fig, simulation_state.update, 1, interval=1, blit=True)
+    # ani = animation.FuncAnimation(fig, simulation_state.update, 1, interval=1, blit=True)
 
-    fig.show()
+    viewport = Viewer(simulation_state)
+
+    # fig.show()
     plt.show()
         
     print("""
