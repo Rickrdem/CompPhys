@@ -4,10 +4,19 @@ from scipy import ndimage as ndi
 def combination(length, digit):
     return np.arange(length)//(3**digit)%3-1
 
-def window(location):
-    d = len(location)
-    digitcombinations = [combination(3**d,i)+val for i,val in enumerate(location)]
-    return list(zip(*digitcombinations))        
+def window(data, location):
+    """
+    Return a windowed view of the data at location assuming periodic boundary conditions.
+    :param data: The original dataset to slice the view out of.
+    :param location: The index at which to view the window
+    :return: A 3x3 window around location with periodic boundary conditions.
+    """
+    x, y = location
+    width, height = data.shape
+    xrange = [x-1, x, x+1]
+    yrange = [y-1, y, y+1]
+    indices = [k + l*height for k in xrange for l in yrange]
+    return data.take(indices, mode='wrap').reshape(3,3)
 
 def nn_interaction(shape):
     middle = len(shape)//2
@@ -33,7 +42,7 @@ def perturb(state, J, T):
     keep it with a chance defined by the acceptance probability
     See wikipedia on monte carlo ising simulation"""
     location = np.unravel_index(np.random.randint(state.size), state.shape)
-    microstate = state.take(window(location), mode='wrap')
+    microstate = window(state, location)
     E = H(microstate, J)
     microstate[tuple(d//2 for d in microstate.shape)] *= -1
     dE = H(microstate, J) - E
