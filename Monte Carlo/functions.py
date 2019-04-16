@@ -1,5 +1,27 @@
 import numpy as np
+import numba
 from scipy import ndimage as ndi
+
+# @numba.jit()
+def metropolis(state, temp=1, steps=100):
+    rows, columns = state.shape
+
+    neighbours = {(i, j): [((i - 1) % rows, j), ((i + 1) % rows, j),
+                           (i, (j - 1) % columns), (i, (j + 1) % columns)]
+                  for i in range(rows) for j in range(columns)
+                  }
+    for step in range(steps):
+        location = np.unravel_index(np.random.randint(state.size), state.shape)
+        delta_E = 0
+        for neighbour in neighbours[location]:
+            delta_E += 2*state[location] * state[neighbour]
+        if delta_E < 0:
+            pass
+        elif np.random.uniform() > np.exp(-1*delta_E/temp):
+            continue
+        state[location] *= -1
+    return state
+
 
 def combination(length, digit):
     return np.arange(length)//(3**digit)%3-1
