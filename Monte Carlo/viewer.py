@@ -33,12 +33,24 @@ class Viewer():
         self.fig = plt.figure()
         self.ax = plt.imshow(self.simulation_state.state, cmap=cm.binary, animated=True)
 
-        plt.subplots_adjust(left=0.25, bottom=0.25)
-
+        # Remove ticklabels from axes
+        plt.tick_params(
+                axis='both',          
+                which='both',     
+                bottom=False,      
+                top=False,
+                left=False,
+                right=False,
+                labelbottom=False,
+                labelleft=False) # labels along the bottom edge are off
+        
+        plt.subplots_adjust(left=0.2, bottom=0.25)
+        
+        # Legend
         values = self.simulation_state.spinchoice
         colors = [ self.ax.cmap(self.ax.norm(value)) for value in values]
         patches = [ mpatches.Patch(color=colors[i], label="Spin {l}".format(l=values[i]) ) for i in range(len(values)) ]
-        plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fancybox=True, shadow=True )
+        plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0. )
         
         #Siders
         self.axspeed = self.fig.add_axes([0.25, 0.20, 0.65, 0.03], facecolor='lightgoldenrodyellow')
@@ -61,7 +73,9 @@ class Viewer():
         self.resetax = self.fig.add_axes([0.85, 0.25, 0.1, 0.04])
         self.reset_button = Button(self.resetax, 'Reset', color='red', hovercolor='0.975')
 
-        self.algorithm_ax = plt.axes([0.025, 0.5, 0.15, 0.15], facecolor='white')
+
+        #Bullet points to switch algorithm
+        self.algorithm_ax = plt.axes([0.1, 0.5, 0.15, 0.15], facecolor='white')
         self.algoritm_menu = RadioButtons(self.algorithm_ax, ('Metropolis', 'Wolff'), active=0)
 
 
@@ -92,17 +106,16 @@ class Viewer():
         self.field_slider.reset()
 
     def alogorithm_choice(self, label):
-#        print(label)
         if label == 'Wolff':
             print("Wolff activated")
-#            self.simulation_state.wolff_algorithm = True
-#            self.simulation_state.metropolis_algorithm = False
+            self.simulation_state.wolff_algorithm = True
+            self.simulation_state.metropolis_algorithm = False
         elif label == 'Metropolis':
             print("Metropopis activated")
-#            self.simulation_state.wolff_algorithm = False
-#            self.simulation_state.metropolis_algorithm = True
+            self.simulation_state.wolff_algorithm = False
+            self.simulation_state.metropolis_algorithm = True
 
-#        self.fig.canvas.draw_idle()
+        self.fig.canvas.draw_idle()
 
 
 if __name__ == '__main__':
