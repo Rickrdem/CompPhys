@@ -12,6 +12,13 @@ class Dynamics():
         self.J = J
         self.T = T
         self.magnetic_field = 0
+        
+        self.steps_per_refresh = 100
+
+        self.metropolis_algorithm = True
+        self.wolff_algorithm = False
+
+
 
         self.neighbours = np.array([[((i-1)%self.rows, j), ((i+1)%self.rows, j),
                                    (i, (j-1)%self.columns), (i,(j+1)%self.columns)]
@@ -38,8 +45,13 @@ class Dynamics():
         self.state = np.random.choice(self.spinchoice, (self.rows,self.columns))
     
     def update(self):
-        self.state = mc.metropolis(self.state.flatten(), self.neighbours, self.T, steps=self.columns*20)
-        self.state = mc.wolff(self.state.flatten(), self.neighbours, self.T, steps=1)#self.columns * 20)
+        if self.metropolis_algorithm:
+            print('m')
+            self.state = mc.metropolis(self.state.flatten(), self.neighbours, self.T, self. J, self.magnetic_field, steps=self.steps_per_refresh)
+        elif self.wolff_algorithm:
+            print('w')
+            self.state = mc.wolff(self.state.flatten(), self.neighbours, self.T, self.J, steps=self.steps_per_refresh)
+        
         self.state = self.state.reshape(self.rows,-1)
         # self.energy.extend(energy_chunk)
         
