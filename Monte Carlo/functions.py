@@ -5,7 +5,9 @@ from scipy import ndimage as ndi
 # @numba.njit()
 def metropolis(state, neighbours, temp=1, steps=100):
     rows, columns = state.shape
+    Energy = np.empty(steps)
     for step in range(steps):
+        Energy[step] = np.sum(state)
         location = (np.random.randint(0,rows), np.random.randint(0,columns))#np.unravel_index(np.random.randint(state.size), state.shape)
         delta_E = 0
         for neighbour in list(neighbours[location]):
@@ -15,6 +17,10 @@ def metropolis(state, neighbours, temp=1, steps=100):
         elif np.random.rand() > np.exp(-1*delta_E/temp):
             continue
         state[location] *= -1
+    return state, Energy
+
+def wolff(state, neighbours, temp=1, steps=100):
+    rows, columns = state.shape
     return state
 
 

@@ -10,12 +10,11 @@ from viewer import Viewer
 if __name__ == "__main__":
     plt.close("all")
 
-    fig, ax = plt.subplots()
     
     J = 1
     T = 1
     
-    simulation_state = Dynamics(J, T, fig, ax)
+    simulation_state = Dynamics(J, T)
             
     # pass a generator in "emitter" to produce data for the update func
     # ani = animation.FuncAnimation(fig, simulation_state.update, 1, interval=1, blit=True)

@@ -5,8 +5,8 @@ import numpy as np
 import functions as func
 
 class Dynamics():
-    def __init__(self, J, T, fig, ax):
-        self.rows = self.columns = 50
+    def __init__(self, J, T):
+        self.rows = self.columns = 256
         self.N = self.rows * self.columns
         self.spinchoice = [1,-1]
         self.J = J
@@ -17,35 +17,24 @@ class Dynamics():
                             for i in range(self.rows) for j in range(self.columns)
                            ], dtype=int).reshape(self.rows, self.columns, 4, 2)
 
-        self.generate_state(fig, ax)
+        self.generate_state()
             
         self.m = 0
         self.chi = 0
         
         self.magnetization = []
         self.susceptibility = []
+        self.energy = []
         
-    def generate_state(self, fig, ax):
+    def generate_state(self):
         self.state = np.random.choice(self.spinchoice, (self.rows,self.columns))
-        self.state = np.eye(self.rows) * 2 - 1
-        # self.im = plt.imshow(self.state, cmap=cm.binary, animated=True)
-        
-        # cbar = fig.colorbar(self.im, ticks=[-1, 1])
-        # cbar.ax.set_yticklabels(['-1', '1'])
     
-    def update(self, i=None):
-        for i in range(10):
-            # self.state = func.perturb(self.state, self.J, self.T)
-            self.state = func.metropolis(self.state, self.neighbours, self.T)
-        # self.im.set_array(-self.state)
+    def update(self):
+        self.state, energy_chunk = func.metropolis(self.state, self.neighbours, self.T, steps=self.columns*20)
+        self.energy.extend(energy_chunk)
         
         self.m = np.average(self.state)
         self.chi = self.N *(np.average(np.square(self.state)) - self.m**2)
         
         self.magnetization.append(self.m)
         self.susceptibility.append(self.chi)
-        
-        print(np.sum(self.state))
-        print(self.T)
-        
-        return #self.im, #<-- What does this , do ?
