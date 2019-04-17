@@ -3,7 +3,7 @@ import numba
 from scipy import ndimage as ndi
 
 # @numba.njit()
-def metropolis(state, neighbours, temp=1, steps=100):
+def metropolis(state, neighbours, temp=1, J=1, H=1, steps=100):
     rows, columns = state.shape
     Energy = np.empty(steps)
     for step in range(steps):
@@ -11,7 +11,7 @@ def metropolis(state, neighbours, temp=1, steps=100):
         location = (np.random.randint(0,rows), np.random.randint(0,columns))#np.unravel_index(np.random.randint(state.size), state.shape)
         delta_E = 0
         for neighbour in list(neighbours[location]):
-            delta_E += 2*state[location] * state[neighbour[0], neighbour[1]]
+            delta_E += J*2*state[location] * state[neighbour[0], neighbour[1]] + 2*H*state[location]
         if delta_E < 0:
             pass
         elif np.random.rand() > np.exp(-1*delta_E/temp):
