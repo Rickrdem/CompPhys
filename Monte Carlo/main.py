@@ -1,6 +1,18 @@
-import numpy as np
+"""
+This is the main file of the Monte Carlo simulation of the Ising Model for
+the course computational physics at Leiden University.
+The program consists of 5 files:
+    main.py, 
+    observables.py, 
+    monte_carlo.py, 
+    dynamics.py and
+    viewport.py
+The program is started by running main.py. 
+@author: Lennard Kwakernaak
+@author: Rick Rodrigues de Mercado
+"""
+
 import matplotlib.pyplot as plt
-# import matplotlib.animation as animation
 
 import observables as obs
 from dynamics import Dynamics
@@ -9,29 +21,29 @@ from viewer import Viewer
 
 if __name__ == "__main__":
     plt.close("all")
-
+    print('Monte Carlo simulation of the Ising model started')
     
+    # Initial values
     J = 1
-    T = 1
+    T = 2.26
     
     simulation_state = Dynamics(J, T)
-            
-    # pass a generator in "emitter" to produce data for the update func
-    # ani = animation.FuncAnimation(fig, simulation_state.update, 1, interval=1, blit=True)
-
+    print('Simulation state created')
+        
+       
     viewport = Viewer(simulation_state)
 
-    # fig.show()
     plt.show()
         
     print("""
-        J = {j}
-        T = {t}
-        """.format(j=J,
-                    t=T))
+        Pair-pair coupling: J = {j}
+        Temperature: T = {t:.2f}
+        Magnetic field: H = {h}
+        """.format(j=simulation_state.J,
+                    t=simulation_state.T,
+                    h=simulation_state.magnetic_field))
 
     obs.magnetization(simulation_state)
     obs.susceptibility(simulation_state)
     
-    print(simulation_state.m)
     print("Done")

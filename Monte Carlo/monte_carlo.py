@@ -1,10 +1,26 @@
+"""
+@author: Lennard Kwakernaak
+@author: Rick Rodrigues de Mercado
+"""
 import numpy as np
 import numba
-from scipy import ndimage as ndi
+#from scipy import ndimage as ndi
 
 
-# @numba.njit()
+@numba.njit()
 def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
+    """
+    Metrpolis algoritm.
+    
+    :param state (1d array): spin of each point 
+    :param neighbours (Nx4 array): contains the 4 neigbours of each spin point
+    :param temp (float): Temperature.
+    :param J (float): Pair-pair coupling.
+    :param H (float): External magnetic field
+    :param steps (int): number of iterations.
+    
+    return: Final state after a pertubation
+    """
     # rows, columns = state.shape
 
     # Energy = np.empty(steps)
@@ -23,9 +39,22 @@ def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
     return state
 
 @numba.njit()
-def wolff(state, neighbours, temp=1, H=0, J=1, steps=1):
+def wolff(state, neighbours, temp=1, J=1, H=0, steps=1):
+    """
+    Wolff algoritm.
+    
+    :param state (1d array): spin of each point 
+    :param neighbours (Nx4 array): contains the 4 neigbours of each spin point
+    :param temp (float): Temperature.
+    :param J (float): Pair-pair coupling.
+    :param H (float): External magnetic field
+    :param steps (int): number of iterations.
+    
+    return: Final state after a pertubation
+    """
+   
+    
     # rows, columns = state.shape
-
     propability = 1. - np.exp(-2*J/temp)
     propability_field = 1 - np.exp(-2*J*np.abs(H)/temp)
     # energy = np.empty(steps)

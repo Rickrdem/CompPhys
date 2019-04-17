@@ -1,7 +1,14 @@
+"""
+@author: Lennard Kwakernaak
+@author: Rick Rodrigues de Mercado
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
 def magnetization(simulation_state):
+    """
+    Plots the average magnetization of the system. 
+    """
     magnetization = simulation_state.magnetization
     time = np.arange(0, len(magnetization), 1)
     
@@ -15,6 +22,9 @@ def magnetization(simulation_state):
     fig.show()
     
 def susceptibility(simulation_state):
+    """
+    Plots the susceptibility per spin. 
+    """
     susceptibility = simulation_state.susceptibility
     time = np.arange(0, len(susceptibility), 1)
     
