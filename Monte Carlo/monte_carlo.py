@@ -51,6 +51,22 @@ def wolff(state, neighbours, temp=1, H=0, J=1, steps=1):
             state[i] *= -1
     return state
 
+@numba.njit()
+def heat_bath(state, neighbours, temp=1, H=1, J=1, steps=1):
+    energy_total = 0
+
+    for step in range(steps):
+        position = np.random.randint(0, len(state))
+        local_field = 0
+        for neighbour in neighbours[position]:
+            local_field += state[neighbour]
+
+        if np.random.rand() < 1/(1+np.exp(-2*(J*local_field + H)/temp)):
+            state[position] = 1
+        else:
+            state[position] = -1
+
+    return state
 
 # def combination(length, digit):
 #     return np.arange(length)//(3**digit)%3-1
