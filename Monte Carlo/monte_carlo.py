@@ -5,44 +5,48 @@ from scipy import ndimage as ndi
 
 # @numba.njit()
 def metropolis(state, neighbours, temp=1, H=0, J=1, steps=100):
-    rows, columns = state.shape
-    Energy = np.empty(steps)
+    # rows, columns = state.shape
+
+    # Energy = np.empty(steps)
     for step in range(steps):
-        Energy[step] = np.sum(state)
-        location = (np.random.randint(0,rows), np.random.randint(0,columns))#np.unravel_index(np.random.randint(state.size), state.shape)
+        # Energy[step] = np.sum(state)
+        # location = (np.random.randint(0,rows), np.random.randint(0,columns))#np.unravel_index(np.random.randint(state.size), state.shape)
+        location = np.random.randint(0, len(state))
         delta_E = 0
         for neighbour_index in list(neighbours[location]):
-            delta_E += 2*J*state[location] * state[neighbour_index[0], neighbour_index[1]] + 2*H*state[location]
+            delta_E += 2*J*state[location] * state[neighbour_index] + 2*H*state[location]
         if delta_E < 0:
             pass
         elif np.random.rand() > np.exp(-1*delta_E/temp):
             continue
         state[location] *= -1
-    return state, Energy
+    return state
 
-# @numba.njit()
+@numba.njit()
 def wolff(state, neighbours, temp=1, J=1, steps=1):
-    rows, columns = state.shape
+    # rows, columns = state.shape
 
     propability = 1. - np.exp(-2*J/temp)
-    energy = np.empty(steps)
+    # energy = np.empty(steps)
 
     for step in range(steps):
-        energy[step] = np.sum(state)
-        location = (np.random.randint(0,rows), np.random.randint(0,columns))
+        # energy[step] = np.sum(state)
+        # location = (np.random.randint(0,rows), np.random.randint(0,columns))
+        location = np.random.randint(0,len(state))
 
-        queue = {location}
+        queue = [location]
         cluster = [location]
 
-        while queue:  # while there are elements left
-            i = queue.pop()
+        while len(queue) > 0:  # while there are elements left
+            i = np.random.choice(np.array(queue))
             for j in list(neighbours[i]):
-                if state[i]==state[j[0],j[1]] and tuple(j) not in cluster and np.random.rand() < propability:
-                    queue.add(tuple(j))
-                    cluster.append(tuple(j))
+                if state[i]==state[j] and j not in cluster and np.random.rand() < propability:
+                    queue.append(j)
+                    cluster.append(j)
+            queue.remove(i)
         for i in cluster:
             state[i] *= -1
-    return state, energy
+    return state
 
 
 def combination(length, digit):
