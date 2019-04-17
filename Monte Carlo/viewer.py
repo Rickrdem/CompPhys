@@ -7,8 +7,8 @@ import matplotlib.animation as animation
 
 class Viewer():
     MINTEMP = 1E-10
-    MAXTEMP = 100
-    TEMP_STEP = 0.1
+    MAXTEMP = 4
+    TEMP_STEP = 1e-4
     def __init__(self, simulation_state, update_every=1):
         # self.fig, self.ax = plt.subplots()
         self.simulation_state = simulation_state
