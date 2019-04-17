@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     
     J = 1
-    T = 1
+    T = 2.26
     
     simulation_state = Dynamics(J, T)
             
@@ -25,8 +25,8 @@ if __name__ == "__main__":
     plt.show()
         
     print("""
-        J = {j}
-        T = {t}
+        Pair-pair coupling: J = {j}
+        Temperature: T = {t}
         """.format(j=J,
                     t=T))
 
