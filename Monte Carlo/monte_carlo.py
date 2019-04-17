@@ -4,7 +4,7 @@ from scipy import ndimage as ndi
 
 
 # @numba.njit()
-def metropolis(state, neighbours, temp=1, H=0, J=1, steps=100):
+def metropolis(state, neighbours, temp=1, J=1, H=0 steps=100):
     # rows, columns = state.shape
 
     # Energy = np.empty(steps)

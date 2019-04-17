@@ -6,11 +6,12 @@ import monte_carlo as mc
 
 class Dynamics():
     def __init__(self, J, T):
-        self.rows = self.columns = 256
+        self.rows = self.columns = 100
         self.N = self.rows * self.columns
         self.spinchoice = [1,-1]
         self.J = J
         self.T = T
+        self.magnetic_field = 0
 
         self.neighbours = np.array([[((i-1)%self.rows, j), ((i+1)%self.rows, j),
                                    (i, (j-1)%self.columns), (i,(j+1)%self.columns)]
