@@ -11,6 +11,12 @@ class Dynamics():
         self.spinchoice = [1,-1]
         self.J = J
         self.T = T
+
+        self.neighbours = np.array([[((i-1)%self.rows, j), ((i+1)%self.rows, j),
+                                   (i, (j-1)%self.columns), (i,(j+1)%self.columns)]
+                            for i in range(self.rows) for j in range(self.columns)
+                           ], dtype=int).reshape(self.rows, self.columns, 4, 2)
+
         self.generate_state(fig, ax)
             
         self.m = 0
@@ -29,7 +35,8 @@ class Dynamics():
     
     def update(self, i=None):
         for i in range(10):
-            self.state = func.perturb(self.state, self.J, self.T)
+            # self.state = func.perturb(self.state, self.J, self.T)
+            self.state = func.metropolis(self.state, self.neighbours, self.T)
         # self.im.set_array(-self.state)
         
         self.m = np.average(self.state)
