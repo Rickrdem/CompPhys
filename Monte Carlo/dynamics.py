@@ -2,11 +2,11 @@ import numpy as np
 # import matplotlib.pyplot as plt
 # import matplotlib.cm as cm
 
-import functions as func
+import monte_carlo as mc
 
 class Dynamics():
     def __init__(self, J, T):
-        self.rows = self.columns = 256
+        self.rows = self.columns = 80
         self.N = self.rows * self.columns
         self.spinchoice = [1,-1]
         self.J = J
@@ -30,7 +30,8 @@ class Dynamics():
         self.state = np.random.choice(self.spinchoice, (self.rows,self.columns))
     
     def update(self):
-        self.state, energy_chunk = func.metropolis(self.state, self.neighbours, self.T, steps=self.columns*20)
+        # self.state, energy_chunk = mc.metropolis(self.state, self.neighbours, self.T, steps=self.columns*20)
+        self.state, energy_chunk = mc.wolff(self.state, self.neighbours, self.T, steps=1)#self.columns * 20)
         self.energy.extend(energy_chunk)
         
         self.m = np.average(self.state)

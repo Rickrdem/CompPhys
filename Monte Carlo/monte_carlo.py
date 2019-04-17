@@ -2,6 +2,7 @@ import numpy as np
 import numba
 from scipy import ndimage as ndi
 
+
 # @numba.njit()
 def metropolis(state, neighbours, temp=1, H=0, J=1, steps=100):
     rows, columns = state.shape
