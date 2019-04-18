@@ -16,7 +16,7 @@ def magnetization(simulation_state):
     ax.plot(time, magnetization)
     
     ax.set_xlabel("Time")
-    ax.set_ylabel("Magnetization")
+    ax.set_ylabel(r"$\langle m \rangle$")
     
     fig.tight_layout()
     fig.show()
@@ -32,7 +32,7 @@ def susceptibility(simulation_state):
     ax.plot(time, susceptibility)
     
     ax.set_xlabel("Time")
-    ax.set_ylabel(r"Susceptibility ($k_BT$)")    
+    ax.set_ylabel(r"$\chi$ ($k_BT$)")    
     
     fig.tight_layout()
     fig.show()

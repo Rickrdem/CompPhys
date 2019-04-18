@@ -29,8 +29,10 @@ class Dynamics():
         
         self.steps_per_refresh = 100
 
-        self.metropolis_algorithm = True
-        self.wolff_algorithm = False
+        self.algorithm_selected = 'Metropolis'
+        self.algorithm_options = {'Metropolis':mc.metropolis, 
+                                  'Wolff':mc.wolff, 
+                                  'Heat Bath':mc.heat_bath}
 
         self.neighbours = np.array([[((i-1)%self.rows, j), ((i+1)%self.rows, j),
                                    (i, (j-1)%self.columns), (i,(j+1)%self.columns)]
@@ -62,10 +64,8 @@ class Dynamics():
         """ 
         Updates the dynamic state and saves macroscopic parameters.
         """
-        if self.metropolis_algorithm:
-            self.state = mc.metropolis(self.state.flatten(), self.neighbours, self.T, self. J, self.magnetic_field, steps=self.steps_per_refresh)
-        elif self.wolff_algorithm:
-            self.state = mc.wolff(self.state.flatten(), self.neighbours, self.T, self.J, self.magnetic_field, steps=self.steps_per_refresh)
+        self.state = self.algorithm_options[self.algorithm_selected](self.state.flatten(), self.neighbours, self.T, 
+                                                                   self.J, self.magnetic_field, steps=self.steps_per_refresh)
         
         self.state = self.state.reshape(self.rows,-1)
         # self.energy.extend(energy_chunk)
