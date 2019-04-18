@@ -64,7 +64,8 @@ class Dynamics():
         """ 
         Updates the dynamic state and saves macroscopic parameters.
         """
-        self.state = self.algorithm_options[self.algorithm_selected](self.state.flatten(), self.neighbours, self.T, self.J, self.magnetic_field, steps=self.steps_per_refresh)
+        self.state = self.algorithm_options[self.algorithm_selected](self.state.flatten(), self.neighbours, self.T, 
+                                                                   self.J, self.magnetic_field, steps=self.steps_per_refresh)
         
         self.state = self.state.reshape(self.rows,-1)
         # self.energy.extend(energy_chunk)
