@@ -19,7 +19,7 @@ class Dynamics():
     :param T (float): The initial temperature.
     """
 
-    def __init__(self, J, T):
+    def __init__(self, J, T, algorithm='Metropolis'):
         self.rows = self.columns = 100
         self.N = self.rows * self.columns
         self.spinchoice = [1,-1]
@@ -29,10 +29,11 @@ class Dynamics():
         
         self.steps_per_refresh = 100
 
-        self.algorithm_selected = 'Metropolis'
+        self.algorithm_selected = algorithm
         self.algorithm_options = {'Metropolis':mc.metropolis, 
                                   'Wolff':mc.wolff, 
-                                  'Heat Bath':mc.heat_bath}
+                                  'Heat Bath':mc.heat_bath,
+                                  'Checkerboard':mc.checkerboard}
 
         self.neighbours = np.array([[((i-1)%self.rows, j), ((i+1)%self.rows, j),
                                    (i, (j-1)%self.columns), (i,(j+1)%self.columns)]

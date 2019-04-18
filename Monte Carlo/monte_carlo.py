@@ -113,33 +113,35 @@ def heat_bath(state, neighbours, temp=1, J=1, H=1, steps=100):
 
     return state
 
-@numba.njit()
+@numba.njit(parallel=True)
 def checkerboard(state, neighbours, temp=1, J=1, H=1, steps=1):
 
     for step in numba.prange(steps):
         propabilities = np.random.rand(len(state))
         # print(state)
         # even
-        for i in range(0, len(state), 2):
+        for i in range(len(state)//2):
+            index = i*2
             delta_E = 0
-            for j in neighbours[i]:
-                delta_E += 2 * J * state[i] * state[j] + 2 * H * state[i]
+            for j in neighbours[index]:
+                delta_E += 2 * J * state[index] * state[j] + 2 * H * state[index]
             if delta_E < 0:
                 pass
-            elif propabilities[i] > np.exp(-1 * delta_E / temp):
+            elif propabilities[index] > np.exp(-1 * delta_E / temp):
                 continue
-            state[i] *= -1
+            state[index] *= -1
 
         # odd
-        for i in numba.prange(1, len(state), 2):
+        for i in numba.prange(len(state)//2):
+            index = 2*i+1
             delta_E = 0
-            for j in neighbours[i]:
-                delta_E += 2 * J * state[i] * state[j] + 2 * H * state[i]
+            for j in neighbours[index]:
+                delta_E += 2 * J * state[index] * state[j] + 2 * H * state[index]
             if delta_E < 0:
                 pass
-            elif propabilities[i] > np.exp(-1 * delta_E / temp):
+            elif propabilities[index] > np.exp(-1 * delta_E / temp):
                 continue
-            state[i] *= -1
+            state[index] *= -1
 
     return state
 
