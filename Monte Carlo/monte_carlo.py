@@ -16,7 +16,7 @@ def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
     :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
                                     spin point
     :param temp (float): Temperature.
-    :param J (float): Pair-pair coupling.
+    :param J (float): Spin-spin coupling.
     :param H (float): External magnetic field
     :param steps (int): number of iterations.
     
@@ -48,7 +48,7 @@ def wolff(state, neighbours, temp=1, J=1, H=0, steps=100):
     :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
                                     spin point
     :param temp (float): Temperature.
-    :param J (float): Pair-pair coupling.
+    :param J (float): Spin-spin coupling.
     :param H (float): External magnetic field
     :param steps (int): number of iterations.
     
@@ -91,7 +91,7 @@ def heat_bath(state, neighbours, temp=1, J=1, H=1, steps=100):
     :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
                                     spin point
     :param temp (float): Temperature.
-    :param J (float): Pair-pair coupling.
+    :param J (float): Spin-spin coupling.
     :param H (float): External magnetic field
     :param steps (int): number of iterations.
     

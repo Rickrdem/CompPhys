@@ -15,7 +15,7 @@ class Dynamics():
     This class contains the methods required to simulate the Ising model.
     Typical usage is to initialise with a state and propagate that state with the update method.
 
-    :param J (float): The initial pair-pair coupling.
+    :param J (float): The initial spin-spin coupling.
     :param T (float): The initial temperature.
     """
 
