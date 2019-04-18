@@ -13,7 +13,8 @@ def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
     Metrpolis algoritm.
     
     :param state (1d array): spin of each point 
-    :param neighbours (Nx4 array): contains the 4 neigbours of each spin point
+    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+                                    spin point
     :param temp (float): Temperature.
     :param J (float): Pair-pair coupling.
     :param H (float): External magnetic field
@@ -39,12 +40,13 @@ def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
     return state
 
 @numba.njit()
-def wolff(state, neighbours, temp=1, J=1, H=0, steps=1):
+def wolff(state, neighbours, temp=1, J=1, H=0, steps=100):
     """
     Wolff algoritm.
     
     :param state (1d array): spin of each point 
-    :param neighbours (Nx4 array): contains the 4 neigbours of each spin point
+    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+                                    spin point
     :param temp (float): Temperature.
     :param J (float): Pair-pair coupling.
     :param H (float): External magnetic field
@@ -81,7 +83,21 @@ def wolff(state, neighbours, temp=1, J=1, H=0, steps=1):
     return state
 
 @numba.njit()
-def heat_bath(state, neighbours, temp=1, H=1, J=1, steps=1):
+def heat_bath(state, neighbours, temp=1, J=1, H=1, steps=100):
+    """
+    Heat Bath algoritm.
+    
+    :param state (1d array): spin of each point (N points)
+    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+                                    spin point
+    :param temp (float): Temperature.
+    :param J (float): Pair-pair coupling.
+    :param H (float): External magnetic field
+    :param steps (int): number of iterations.
+    
+    return: Final state after a pertubation
+    """
+
     energy_total = 0
 
     for step in range(steps):
