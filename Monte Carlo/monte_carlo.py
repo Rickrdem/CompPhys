@@ -81,7 +81,7 @@ def wolff(state, neighbours, temp=1, J=1, H=0, steps=1):
     return state
 
 @numba.njit()
-def heat_bath(state, neighbours, temp=1, H=1, J=1, steps=1):
+def heat_bath(state, neighbours, temp=1, J=1, H=1, steps=1):
     energy_total = 0
 
     for step in range(steps):
@@ -94,6 +94,36 @@ def heat_bath(state, neighbours, temp=1, H=1, J=1, steps=1):
             state[position] = 1
         else:
             state[position] = -1
+
+    return state
+
+@numba.njit()
+def checkerboard(state, neighbours, temp=1, J=1, H=1, steps=1):
+
+    for step in numba.prange(steps):
+        propabilities = np.random.rand(len(state))
+        # print(state)
+        # even
+        for i in range(0, len(state), 2):
+            delta_E = 0
+            for j in neighbours[i]:
+                delta_E += 2 * J * state[i] * state[j] + 2 * H * state[i]
+            if delta_E < 0:
+                pass
+            elif propabilities[i] > np.exp(-1 * delta_E / temp):
+                continue
+            state[i] *= -1
+
+        # odd
+        for i in numba.prange(1, len(state), 2):
+            delta_E = 0
+            for j in neighbours[i]:
+                delta_E += 2 * J * state[i] * state[j] + 2 * H * state[i]
+            if delta_E < 0:
+                pass
+            elif propabilities[i] > np.exp(-1 * delta_E / temp):
+                continue
+            state[i] *= -1
 
     return state
 
