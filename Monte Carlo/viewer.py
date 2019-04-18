@@ -31,7 +31,7 @@ class Viewer():
     def __init__(self, simulation_state, update_every=1):
         # self.fig, self.ax = plt.subplots()
         self.simulation_state = simulation_state
-        print(type(self.simulation_state))
+
         self.update_every = update_every
         
         self.initial_temperature = self.simulation_state.T
@@ -86,7 +86,8 @@ class Viewer():
 
         # Bullet points to switch algorithm
         self.algorithm_ax = plt.axes([0.1, 0.5, 0.15, 0.15], facecolor='white')
-        self.algoritm_menu = RadioButtons(self.algorithm_ax, ('Metropolis', 'Wolff', 'Heat Bath'), active=0)
+        self.algoritm_menu = RadioButtons(self.algorithm_ax, activecolor='red', labels=('Metropolis', 'Wolff', 'Heat Bath'), active=0)
+        self.algorithm_ax.text(0, 1.1, 'Choose Algorithm')
 
         self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=5)
         
@@ -98,31 +99,28 @@ class Viewer():
         """
         Updates the figure.
         """
-        # Refresh parameters that have changed via on screen input
-        self.slider_changes()
-        self.reset_button.on_clicked(self.reset)
-        self.algoritm_menu.on_clicked(self.alogorithm_choice)
+        self.input_changes()
         
         for i in range(self.update_every):
             self.simulation_state.update_and_save()
         self.ax.set_array(self.simulation_state.state)
         return self.ax,
 
-    def slider_changes(self):
+    def input_changes(self):
         """
-        Updates the values of parameters that changed via the sliders
+        Updates the values of parameters that changed via the on screen options
         """
         self.simulation_state.steps_per_refresh = int(self.speed_slider.val)
         self.simulation_state.T = float(self.temp_slider.val)
         self.simulation_state.J = float(self.coupling_slider.val)
         self.simulation_state.magnetic_field = float(self.field_slider.val)
-
+        self.reset_button.on_clicked(self.reset)
+        self.algoritm_menu.on_clicked(self.alogorithm_choice)
 
     def reset(self, event):
         """
         Resets all paramaters to their initial value
         """
-        print(event)
         self.simulation_state.T = self.initial_temperature
         self.simulation_state.J = self.initial_paircoupling
         self.simulation_state.magnetic_field = self.initial_field
