@@ -86,7 +86,7 @@ class Viewer():
 
         # Bullet points to switch algorithm
         self.algorithm_ax = plt.axes([0.1, 0.5, 0.15, 0.15], facecolor='white')
-        self.algoritm_menu = RadioButtons(self.algorithm_ax, ('Metropolis', 'Wolff'), active=0)
+        self.algoritm_menu = RadioButtons(self.algorithm_ax, ('Metropolis', 'Wolff', 'Heat Bath'), active=0)
 
         self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=5)
         
@@ -136,13 +136,5 @@ class Viewer():
         
         :param label (str): name of the algorithm that is choosen
         """
-        if label == 'Wolff':
-            print("Wolff activated")
-            self.simulation_state.wolff_algorithm = True
-            self.simulation_state.metropolis_algorithm = False
-        elif label == 'Metropolis':
-            print("Metropopis activated")
-            self.simulation_state.wolff_algorithm = False
-            self.simulation_state.metropolis_algorithm = True
-
+        self.simulation_state.algorithm_selected = label
         self.fig.canvas.draw_idle()
