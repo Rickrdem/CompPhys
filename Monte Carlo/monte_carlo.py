@@ -10,7 +10,7 @@ import numba
 @numba.njit()
 def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
     """
-    Metrpolis algoritm.
+    Metrpolis algorithm.
     
     :param state (1d array): spin of each point 
     :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
@@ -42,7 +42,7 @@ def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
 @numba.njit()
 def wolff(state, neighbours, temp=1, J=1, H=0, steps=100):
     """
-    Wolff algoritm.
+    Wolff algorithm.
     
     :param state (1d array): spin of each point 
     :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
@@ -85,7 +85,7 @@ def wolff(state, neighbours, temp=1, J=1, H=0, steps=100):
 @numba.njit()
 def heat_bath(state, neighbours, temp=1, J=1, H=1, steps=100):
     """
-    Heat Bath algoritm.
+    Heat Bath algorithm.
     
     :param state (1d array): spin of each point (N points)
     :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
@@ -115,6 +115,19 @@ def heat_bath(state, neighbours, temp=1, J=1, H=1, steps=100):
 
 @numba.njit(parallel=True)
 def checkerboard(state, neighbours, temp=1, J=1, H=1, steps=1):
+    """
+    Chekerboard algorithm.
+    
+    :param state (1d array): spin of each point (N points)
+    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+                                    spin point
+    :param temp (float): Temperature.
+    :param J (float): Spin-spin coupling.
+    :param H (float): External magnetic field
+    :param steps (int): number of iterations.
+    
+    return: Final state after a pertubation
+    """
 
     for step in numba.prange(steps):
         propabilities = np.random.rand(len(state))
