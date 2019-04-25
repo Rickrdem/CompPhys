@@ -44,6 +44,7 @@ if __name__ == "__main__":
                     h=simulation_state.magnetic_field))
 
     obs.magnetization(simulation_state)
-    obs.susceptibility(simulation_state)
+    # obs.susceptibility(simulation_state)
+    plt.show()
     
     print("Done")
