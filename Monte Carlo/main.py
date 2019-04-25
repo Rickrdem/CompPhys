@@ -11,14 +11,27 @@ The program is started by running main.py.
 @author: Lennard Kwakernaak (1691988)
 @author: Rick Rodrigues de Mercado (1687115)
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
 
 import observables as obs
 from dynamics import Dynamics
 from viewer import Viewer
 
+def progress(count, total, status=''):
+    """
+    Plot a loading bar while running a headless simulation
+    """
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('\r \r[%s] %s%s ...%s' % (bar, percents, '%', status))
+    sys.stdout.flush()
 
 if __name__ == "__main__":
     plt.close("all")
@@ -27,16 +40,17 @@ if __name__ == "__main__":
     # Initial values
     headless = True
     j_coupling = 1
-#    temp = 2 / (np.log(1 + np.sqrt(2)))
-    temp = 1
+    temp = 2 / (np.log(1 + np.sqrt(2)))
+#    temp = 1
     
     simulation_state = Dynamics(j_coupling, temp, algorithm='Checkerboard')
     print('Simulation state created')
         
-    if headless: 
-        for i in range(1000 + 200):
+    if headless:
+        iterations = 1000 + 200
+        for i in range(iterations):
             simulation_state.update_and_save()
-            print("time step: ", i)
+            progress(i, iterations)
     else: 
         viewport = Viewer(simulation_state)
 
