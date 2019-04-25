@@ -30,15 +30,6 @@ def magnetization(simulation_state):
     magnetization_error = bootstrap(magnetization, np.average)
     time = np.arange(0, len(magnetization), 1)
     
-#    fig, ax = plt.subplots()
-#    ax.plot(time, magnetization, color='blue')
-#    
-#    ax.set_xlabel("Time steps")
-#    ax.set_ylabel("m")
-#    
-#    fig.tight_layout()
-#    fig.show()
-    
     # Set up the axes with gridspec
     fig = plt.figure()
     grid = plt.GridSpec(1, 6, fig, hspace=0.2, wspace=0.2)
