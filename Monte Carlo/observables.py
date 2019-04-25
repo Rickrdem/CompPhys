@@ -41,7 +41,7 @@ def susceptibility(simulation_state):
     """
     Calculates the susceptibility per spin.
     """
-    func = lambda x: np.var(x)*simulation_state.N/simulation_state.T
+    func = lambda x: np.var(x)*simulation_state.num_spins/simulation_state.temp
     sus = func(simulation_state.magnetization)
     sus_error = bootstrap(simulation_state.magnetization, func)
     return sus, sus_error
@@ -50,7 +50,7 @@ def specific_heat(simulation_state):
     """
     Calculates the specific heat of the system.
     """
-    func = lambda x: np.var(x)/simulation_state.N/(simulation_state.T**2)
+    func = lambda x: np.var(x)/simulation_state.num_spins/(simulation_state.temp**2)
     s_heat = func(simulation_state.energy)
     s_heat_err = bootstrap(simulation_state.energy, func)
 
@@ -62,10 +62,10 @@ def nn_interaction(shape):
     shape[middle] = 0
     return np.sum(m*shape)
 
-def energy(state, J=1, H=0):
+def energy(state, j_coupling=1, H=0):
     """ Hamiltonian operator on a state vector for free bounds"""
     footprint = np.array([[0,1,0],[1,1,1],[0,1,0]])
-    return -J * np.sum(ndi.generic_filter(
+    return -j_coupling * np.sum(ndi.generic_filter(
         state, function=nn_interaction, footprint=footprint, mode='wrap'))
 
 def bootstrap(data, function, n=100):

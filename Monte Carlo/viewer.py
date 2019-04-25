@@ -35,8 +35,8 @@ class Viewer():
 
         self.update_every = update_every
         
-        self.initial_temperature = self.simulation_state.T
-        self.initial_paircoupling = self.simulation_state.J
+        self.initial_temperature = self.simulation_state.temp
+        self.initial_paircoupling = self.simulation_state.j_coupling
         self.initial_field = self.simulation_state.magnetic_field
 
         self._init_matplotlib()
@@ -71,11 +71,11 @@ class Viewer():
 
         self.axtemp = self.fig.add_axes([0.25, 0.15, 0.65, 0.03], facecolor='lightgoldenrodyellow')
         self.temp_slider = Slider(self.axtemp, 'Temperature', self.MINTEMP, self.MAXTEMP, 
-                                  valinit=self.simulation_state.T, valstep=self.TEMP_STEP)
+                                  valinit=self.simulation_state.temp, valstep=self.TEMP_STEP)
 
         self.axcoupling = self.fig.add_axes([0.25, 0.10, 0.65, 0.03], facecolor='lightgoldenrodyellow')
         self.coupling_slider = Slider(self.axcoupling, 'Pair-Coupling', self.MINCOUPLING, self.MAXCOUPLING, 
-                                      valinit=self.simulation_state.J, valstep=self.COUPLING_STEP)
+                                      valinit=self.simulation_state.j_coupling, valstep=self.COUPLING_STEP)
         
         self.axfield = self.fig.add_axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
         self.field_slider = Slider(self.axfield, 'Magnetic Field', self.MINFIELD, self.MAXFIELD, 
@@ -113,8 +113,8 @@ class Viewer():
         Updates the values of parameters that changed via the on screen options
         """
         self.simulation_state.steps_per_refresh = int(self.speed_slider.val)
-        self.simulation_state.T = float(self.temp_slider.val)
-        self.simulation_state.J = float(self.coupling_slider.val)
+        self.simulation_state.temp = float(self.temp_slider.val)
+        self.simulation_state.j_coupling = float(self.coupling_slider.val)
         self.simulation_state.magnetic_field = float(self.field_slider.val)
         self.reset_button.on_clicked(self.reset)
         self.algoritm_menu.on_clicked(self.alogorithm_choice)
@@ -123,8 +123,8 @@ class Viewer():
         """
         Resets all paramaters to their initial value
         """
-        self.simulation_state.T = self.initial_temperature
-        self.simulation_state.J = self.initial_paircoupling
+        self.simulation_state.temp = self.initial_temperature
+        self.simulation_state.j_coupling = self.initial_paircoupling
         self.simulation_state.magnetic_field = self.initial_field
         self.temp_slider.reset()
         self.coupling_slider.reset()

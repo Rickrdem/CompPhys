@@ -16,16 +16,16 @@ class Dynamics():
     This class contains the methods required to simulate the Ising model.
     Typical usage is to initialise with a state and propagate that state with the update method.
 
-    :param J (float): The initial spin-spin coupling.
-    :param T (float): The initial temperature.
+    :param j_coupling (float): The initial spin-spin coupling.
+    :param temp (float): The initial temperature.
     """
 
-    def __init__(self, J, T, algorithm='Metropolis'):
-        self.rows = self.columns = 200
-        self.N = self.rows * self.columns
+    def __init__(self, j_coupling, temp, algorithm='Metropolis'):
+        self.rows = self.columns = 100
+        self.num_spins = self.rows * self.columns
         self.spinchoice = [1,-1]
-        self.J = J
-        self.T = T
+        self.j_coupling = j_coupling
+        self.temp = temp
         self.magnetic_field = 0
         
         self.steps_per_refresh = 100
@@ -41,11 +41,11 @@ class Dynamics():
                             for i in range(self.rows) for j in range(self.columns)
                            ], dtype=int).reshape(self.rows, self.columns, 4, 2)
 
-        self.neighbours = np.array([[(i//self.columns)*self.rows+(i+1)%self.rows,
-                                    (i+self.columns)%self.N,
-                                    (i//self.columns)*self.rows+(i-1)%self.rows,
-                                    (i-self.columns)%self.N]
-                                    for i in range(self.N)])
+        self.neighbours = np.array([[(i//self.columns) * self.rows + (i+1) % self.rows,
+                                     (i+self.columns) % self.num_spins,
+                                     (i//self.columns) * self.rows + (i-1) % self.rows,
+                                     (i-self.columns) % self.num_spins]
+                                    for i in range(self.num_spins)])
 
         self.generate_state()
 
@@ -62,12 +62,12 @@ class Dynamics():
         """ 
         Updates the dynamic state and saves macroscopic parameters.
         """
-        self.state = self.algorithm_options[self.algorithm_selected](self.state.flatten(), self.neighbours, self.T, 
-                                                                   self.J, self.magnetic_field, steps=self.steps_per_refresh)
+        self.state = self.algorithm_options[self.algorithm_selected](self.state.flatten(), self.neighbours, self.temp,
+                                                                     self.j_coupling, self.magnetic_field, steps=self.steps_per_refresh)
         
         self.state = self.state.reshape(self.rows,-1)
         # self.energy.extend(energy_chunk)
 
         
-        self.magnetization.append(np.sum(self.state)/self.N)
-        self.energy.append(obs.energy(self.state, self.J, self.magnetic_field))
+        self.magnetization.append(np.sum(self.state) / self.num_spins)
+        self.energy.append(obs.energy(self.state, self.j_coupling, self.magnetic_field))

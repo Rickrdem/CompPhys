@@ -25,10 +25,10 @@ if __name__ == "__main__":
     print('Monte Carlo simulation of the Ising model started')
     
     # Initial values
-    J = 1
-    T = 2/(np.log(1+np.sqrt(2)))
+    j_coupling = 1
+    temp = 2 / (np.log(1 + np.sqrt(2)))
     
-    simulation_state = Dynamics(J, T)
+    simulation_state = Dynamics(j_coupling, temp)
     print('Simulation state created')
         
        
@@ -45,14 +45,14 @@ if __name__ == "__main__":
         heat, heat_err = obs.specific_heat(simulation_state)
 
         print(r"""
-            Pair-pair coupling: J = {j}
-            Temperature: T = {temp:.2f}
+            Pair-pair coupling: j_coupling = {j}
+            Temperature: temp = {temp:.2f}
             Magnetic field: H = {field}
             Average magnetization: <m> {m:.3f} $\pm$ {m_err:.3f}
             Susceptibility: $\chi$ = {s:.2f} $\pm$ {s_err:.2f}
             Specific heat: C_v = {h:.2f} $\pm$ {h_err:.2f}
-            """.format(j=simulation_state.J,
-                        temp=simulation_state.T,
+            """.format(j=simulation_state.j_coupling,
+                        temp=simulation_state.temp,
                         field=simulation_state.magnetic_field,
                         m=mag,
                         m_err=mag_err,
