@@ -90,7 +90,7 @@ class Viewer():
                                           labels=('Metropolis', 'Wolff', 'Heat Bath', 'Checkerboard'), active=0)
         self.algorithm_ax.text(0, 1.1, 'Choose Algorithm')
 
-        self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=5)
+        self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=1)
         
         print('Windows created')
         print('Starting app')
