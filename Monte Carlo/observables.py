@@ -5,6 +5,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndi
+import matplotlib.mlab as mlab
+import scipy.stats as stats
+
 
 def trim_data(simulation_state, start, end=None):
     """
@@ -27,14 +30,49 @@ def magnetization(simulation_state):
     magnetization_error = bootstrap(magnetization, np.average)
     time = np.arange(0, len(magnetization), 1)
     
-    fig, ax = plt.subplots()
-    ax.plot(time, magnetization)
+#    fig, ax = plt.subplots()
+#    ax.plot(time, magnetization, color='blue')
+#    
+#    ax.set_xlabel("Time steps")
+#    ax.set_ylabel("m")
+#    
+#    fig.tight_layout()
+#    fig.show()
     
+    # Set up the axes with gridspec
+    fig = plt.figure()
+    grid = plt.GridSpec(1, 6, fig, hspace=0.2, wspace=0.2)
+
+    ax = fig.add_subplot(grid[0, 0:4])
+    ax2 = fig.add_subplot(grid[0, 4:], sharey=ax)
+
+    # Plot data in main axis ax
+    ax.plot(time, magnetization, c='b', label='Measured')
+
+    # Normalized histogram on the attached axis ax2    
+    n, bins, patches = ax2.hist(magnetization, int(np.sqrt(len(magnetization))), density=1,
+                                orientation='horizontal', color='blue')
+
+    (mu, sigma) = stats.norm.fit(magnetization)
+    y = mlab.normpdf(bins, mu, sigma)
+    ax2.hlines(y=mu, xmin=0, xmax=np.max(y), color='red', linestyle=':')
+
+    ax2.plot(y, bins, 'r--', linewidth=2, label='pdf')
+
     ax.set_xlabel("Time steps")
-    ax.set_ylabel("m")
-    
-    fig.tight_layout()
+    ax.set_ylabel(r"$m$")
+    ax2.set_xlabel("Probability density")
+
+    ax2.set_title("$\mu$={m:.2f}, $\sigma$={s:.3f}, err={e:.4f}".format(m=mu, 
+                                                                      s=sigma,
+                                                                      e=magnetization_error))
+    plt.setp(ax2.get_yticklabels(), visible=False)
+
+    ax.legend()
+    ax2.legend()
     fig.show()
+
+    
     return average_magnetization, magnetization_error
     
 def susceptibility(simulation_state):
@@ -55,6 +93,19 @@ def specific_heat(simulation_state):
     s_heat_err = bootstrap(simulation_state.energy, func)
 
     return s_heat, s_heat_err
+
+#def magn_vs_temp(simulation_state):
+#    magnetization = simulation_state.magnetization
+#    temperatures = np.arange(0, 0.001*len(magnetization)/( 2 / (np.log(1 + np.sqrt(2)))), 0.001/( 2 / (np.log(1 + np.sqrt(2)))))
+#    
+#    fig, ax = plt.subplots()
+#    ax.plot(temperatures, magnetization, color='blue')
+#    
+#    ax.set_xlabel(r"T/T$_C$")
+#    ax.set_ylabel("m")
+#    
+#    fig.tight_layout()
+#    fig.show()
 
 def nn_interaction(shape):
     middle = len(shape)//2
