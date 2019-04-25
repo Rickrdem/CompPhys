@@ -7,6 +7,7 @@ import numpy as np
 # import matplotlib.cm as cm
 
 import monte_carlo as mc
+import observables as obs
 
 class Dynamics():
     """
@@ -20,7 +21,7 @@ class Dynamics():
     """
 
     def __init__(self, J, T, algorithm='Metropolis'):
-        self.rows = self.columns = 100
+        self.rows = self.columns = 200
         self.N = self.rows * self.columns
         self.spinchoice = [1,-1]
         self.J = J
@@ -47,12 +48,8 @@ class Dynamics():
                                     for i in range(self.N)])
 
         self.generate_state()
-            
-        self.m = 0
-        self.chi = 0
-        
+
         self.magnetization = []
-        self.susceptibility = []
         self.energy = []
         
     def generate_state(self):
@@ -70,9 +67,7 @@ class Dynamics():
         
         self.state = self.state.reshape(self.rows,-1)
         # self.energy.extend(energy_chunk)
+
         
-        self.m = np.average(self.state)
-        self.chi = self.N *(np.average(np.square(self.state)) - self.m**2)
-        
-        self.magnetization.append(self.m)
-        self.susceptibility.append(self.chi)
+        self.magnetization.append(np.sum(self.state)/self.N)
+        self.energy.append(obs.energy(self.state, self.J, self.magnetic_field))
