@@ -30,7 +30,7 @@ def magnetization(simulation_state):
     fig, ax = plt.subplots()
     ax.plot(time, magnetization)
     
-    ax.set_xlabel("Time")
+    ax.set_xlabel("Time steps")
     ax.set_ylabel("m")
     
     fig.tight_layout()
