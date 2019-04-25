@@ -39,7 +39,7 @@ def metropolis(state, neighbours, temp=1, J=1, H=0, steps=100):
         state[location] *= -1
     return state
 
-@numba.njit()
+# @numba.njit()
 def wolff(state, neighbours, temp=1, J=1, H=0, steps=100):
     """
     Wolff algoritm.
@@ -58,28 +58,44 @@ def wolff(state, neighbours, temp=1, J=1, H=0, steps=100):
     
     # rows, columns = state.shape
     propability = 1. - np.exp(-2*J/temp)
-    propability_field = 1 - np.exp(-2*J*np.abs(H)/temp)
+    propability_field = 1 - np.exp(-2*np.abs(H)/temp)
     # energy = np.empty(steps)
+    field_spin = np.sign(H)
 
     for step in range(steps):
         # energy[step] = np.sum(state)
         # location = (np.random.randint(0,rows), np.random.randint(0,columns))
-        location = np.random.randint(0,len(state))
+        location = np.random.randint(0,len(state))  # random site to start
 
         queue = [location]
         cluster = [location]
 
         while len(queue) > 0:  # while there are elements left
             i = np.random.choice(np.array(queue))
-            for j in list(neighbours[i]):
+
+            if i < 0:  # the 'ghost spin' that represents the field
+                nearest_neighbours = state
+            else:
+                nearest_neighbours = np.append(neighbours[i], -1)
+                # nearest_neighbours.append(-1)
+
+            for j in nearest_neighbours:
                 if j not in cluster:
-                    if (state[i]==state[j] and np.random.rand() < propability)\
-                            or (state[i]*state[j]*np.sign(H) > 0 and np.random.rand() < propability_field):
-                        queue.append(j)
-                        cluster.append(j)
+                    if j > 0:
+                        if state[i] == state[j] and np.random.rand() < propability:
+                            queue.append(j)
+                            cluster.append(j)
+                    else:  # external field
+                        if state[i]*field_spin*np.sign(H) > 0 and np.random.rand() < propability_field:
+                            queue.append(j)
+                            cluster.append(j)
             queue.remove(i)
         for i in cluster:
-            state[i] *= -1
+            if i > 0:
+                state[i] *= -1
+            else:
+                field_spin *= -1
+                print('field contribution!')
     return state
 
 @numba.njit()
