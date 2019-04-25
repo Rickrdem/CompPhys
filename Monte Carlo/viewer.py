@@ -22,6 +22,7 @@ class Viewer():
     MINTEMP = 1E-10
     MAXTEMP = 4
     TEMP_STEP = 1e-4
+    MAXSPEED = 300
     MINCOUPLING = -5
     MAXCOUPLING = 200
     COUPLING_STEP = 0.01
@@ -65,7 +66,7 @@ class Viewer():
         
         #Siders
         self.axspeed = self.fig.add_axes([0.25, 0.20, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-        self.speed_slider = Slider(self.axspeed, 'Speed', 1, self.simulation_state.columns*100, 
+        self.speed_slider = Slider(self.axspeed, 'Speed', 1, self.MAXSPEED,
                                   valinit=self.simulation_state.steps_per_refresh, valstep=1, valfmt="%1.0i")
 
         self.axtemp = self.fig.add_axes([0.25, 0.15, 0.65, 0.03], facecolor='lightgoldenrodyellow')
@@ -133,7 +134,10 @@ class Viewer():
         """
         Switches between different algorithms
         
-        :param label (str): name of the algorithm that is choosen
+        :param label (str): name of the algorithm that is chosen
         """
         self.simulation_state.algorithm_selected = label
+        if label == 'Wolff':
+            self.speed_slider.val = 2
+            self.simulation_state.steps_per_refresh = 2
         self.fig.canvas.draw_idle()
