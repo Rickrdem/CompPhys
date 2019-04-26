@@ -88,7 +88,7 @@ class Viewer():
         # Bullet points to switch algorithm
         self.algorithm_ax = plt.axes([0.06, 0.5, 0.23, 0.15], facecolor='white')
         self.algoritm_menu = RadioButtons(self.algorithm_ax, activecolor='red', 
-                                          labels=('Metropolis', 'Wolff', 'Heat Bath', 'Checkerboard'), active=3)
+                                          labels=('Metropolis', 'Wolff', 'Heat Bath', 'Checkerboard'), active=0)
         self.algorithm_ax.text(0, 1.1, 'Choose Algorithm')
 
         self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=1)
