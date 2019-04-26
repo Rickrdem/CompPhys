@@ -85,18 +85,16 @@ def specific_heat(simulation_state):
 
     return s_heat, s_heat_err
 
-#def magn_vs_temp(simulation_state):
-#    magnetization = simulation_state.magnetization
-#    temperatures = np.arange(0, 0.001*len(magnetization)/( 2 / (np.log(1 + np.sqrt(2)))), 0.001/( 2 / (np.log(1 + np.sqrt(2)))))
-#    
-#    fig, ax = plt.subplots()
-#    ax.plot(temperatures, magnetization, color='blue')
-#    
-#    ax.set_xlabel(r"T/T$_C$")
-#    ax.set_ylabel("m")
-#    
-#    fig.tight_layout()
-#    fig.show()
+def magn_vs_field(simulation_state, temp, fig, ax):
+    magnetization = simulation_state.magnetization
+    field = np.arange(-5, 5, 0.1)
+    
+    ax.plot(field, magnetization, color='blue', label="T="+str(temp))
+    
+    ax.set_xlabel("H")
+    ax.set_ylabel("m")
+    ax.legend()
+
 
 def nn_interaction(shape):
     middle = len(shape)//2
