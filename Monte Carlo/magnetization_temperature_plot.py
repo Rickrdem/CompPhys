@@ -16,8 +16,8 @@ def magn_vs_temp():
     ax.set_xlim((0,1.3))
     ax.set_ylim((-1.2,1.2))
     
-    ax.set_xlabel(r"T/T$_C$")
-    ax.set_ylabel("m")
+    ax.set_xlabel(r"$T/T_C$")
+    ax.set_ylabel(r"$m$")
     
     fig.tight_layout()
     fig.show()
