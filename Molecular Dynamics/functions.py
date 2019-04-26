@@ -38,7 +38,7 @@ def fcc_lattice(boxsize, a=1, dim=3):
     :param boxsize: float of the side lengt of a square box
     :param a: float of the lattice constant of the fcc
     :param dim: int of the dimension of the system
-    :return: Nxdim array of coordinates of all N lattice point
+    :return: Nxdim array of coordinates of all num_spins lattice point
     """   
     sc1 = np.array(list(product(np.arange(a/4, boxsize-a/4, a), repeat=dim)))
 
@@ -88,10 +88,10 @@ def sum_potential_jit(r):
 @numba.njit()
 def force_jit(r):
     """
-    Calculate the total force on particle N due to the contributions of all other particles 
+    Calculate the total force on particle num_spins due to the contributions of all other particles
     in the standard Lennard-Jones potential.
     :param r: NxNxd matrix containing all the distances between all particles in reduced units.
-    :return: Nxd matrix containing the force on every particle N in every dimension d.
+    :return: Nxd matrix containing the force on every particle num_spins in every dimension d.
     """
     particles = r.shape[0]
     dimensions = r.shape[2]

@@ -49,7 +49,7 @@ def wolff(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=100):
     """
     # We use a ghost spin at index '-1' that we use to model the effect of the 
     # external magnetic field
-    ghost_spin = -1  
+    ghost_spin = -1
 
     for step in range(steps):
         location = np.random.randint(0,len(state))  # random site to start
@@ -76,9 +76,9 @@ def wolff(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=100):
                 for neighbour in nearest_neighbours:
                     if neighbour not in cluster:
                         if neighbour == -1:  # neighbour is the ghost
-                            delta_z = -2*magnetic_field * state[current] * ghost_spin
+                            delta_z = 2*magnetic_field * state[current] * ghost_spin
                         elif current == -1:  # current is the ghost
-                            delta_z = -2*magnetic_field * state[neighbour] * ghost_spin
+                            delta_z = 2*magnetic_field * state[neighbour] * ghost_spin
                         else:
                             delta_z = -2*j_coupling * state[neighbour] * state[current]
 
@@ -86,7 +86,7 @@ def wolff(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=100):
                             queue.append(neighbour)
                             cluster.append(neighbour)
                 if current == -1:
-                    ghost_spin *= -1
+                    ghost_spin *= 1
                 else:
                     state[current] *= -1
     return state

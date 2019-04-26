@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 from matplotlib import cm
 import matplotlib.patches as mpatches
-#import time
 import matplotlib.animation as animation
 
 class Viewer():
@@ -30,7 +29,6 @@ class Viewer():
     MAXFIELD = 5
     FIELD_STEP = 0.01    
     def __init__(self, simulation_state, update_every=1):
-        # self.fig, self.ax = plt.subplots()
         self.simulation_state = simulation_state
 
         self.update_every = update_every
@@ -96,7 +94,6 @@ class Viewer():
         print('Windows created')
         print('Starting app')
 
-
     def update(self, *args):
         """
         Updates the figure.
@@ -117,7 +114,7 @@ class Viewer():
         self.simulation_state.j_coupling = float(self.coupling_slider.val)
         self.simulation_state.magnetic_field = float(self.field_slider.val)
         self.reset_button.on_clicked(self.reset)
-        self.algoritm_menu.on_clicked(self.alogorithm_choice)
+        self.algoritm_menu.on_clicked(self.algorithm_choice)
 
     def reset(self, event):
         """
@@ -130,7 +127,7 @@ class Viewer():
         self.coupling_slider.reset()
         self.field_slider.reset()
 
-    def alogorithm_choice(self, label):
+    def algorithm_choice(self, label):
         """
         Switches between different algorithms
         

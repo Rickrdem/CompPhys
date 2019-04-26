@@ -57,7 +57,7 @@ def plot_velocity_distribution(simulation_state):
     ax.plot(x, maxwell.pdf(x, *params) * N, color='black', lw=3)
 
     ax.set_xlabel("Velocity")
-    ax.set_ylabel("N")
+    ax.set_ylabel("num_spins")
     ax.set_title(r"$\mu$={m:.2f}, $\sigma$={s:.3f}".format(m=mean, s=var * .5))
     fig.tight_layout()
     fig.show()
@@ -92,7 +92,7 @@ def plot_temperature(simulation_state):
     err = bootstrap(temp, np.average)
 
     ax.set_xlabel(r"$t/\tau$")
-    ax.set_ylabel(r"$T$")
+    ax.set_ylabel(r"$temp$")
     ax2.set_xlabel("Probability density")
 
     ax2.set_title("$\mu$={m:.2f}, $\sigma$={s:.3f}, err={e:.4f}".format(m=mu, 
