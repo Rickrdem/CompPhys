@@ -3,8 +3,6 @@
 @author: Rick Rodrigues de Mercado
 """
 import numpy as np
-# import matplotlib.pyplot as plt
-# import matplotlib.cm as cm
 
 import monte_carlo as mc
 import observables as obs
@@ -66,8 +64,6 @@ class Dynamics():
                                                                      self.j_coupling, self.magnetic_field, steps=self.steps_per_refresh)
         
         self.state = self.state.reshape(self.rows,-1)
-        # self.energy.extend(energy_chunk)
-
         
         self.magnetization.append(np.sum(self.state) / self.num_spins)
         self.energy.append(obs.energy(self.state, self.j_coupling, self.magnetic_field))

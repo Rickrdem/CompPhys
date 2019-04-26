@@ -20,12 +20,7 @@ def metropolis(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=
     
     return: Final state after a perturbation
     """
-    # rows, columns = state.shape
-
-    # Energy = np.empty(steps)
     for step in range(steps):
-        # Energy[step] = np.sum(state)
-        # location = (np.random.randint(0,rows), np.random.randint(0,columns))#np.unravel_index(np.random.randint(state.size), state.shape)
         location = np.random.randint(0, len(state))
         delta_E = 0
         for neighbour_index in list(neighbours[location]):
@@ -52,9 +47,9 @@ def wolff(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=100):
     
     return: Final state after a perturbation
     """
-    # rows, columns = state.shape
-
-    ghost_spin = -1  # we use a ghost spin at index '-1' that we use to model the effect of the external magnetic field
+    # We use a ghost spin at index '-1' that we use to model the effect of the 
+    # external magnetic field
+    ghost_spin = -1  
 
     for step in range(steps):
         location = np.random.randint(0,len(state))  # random site to start
@@ -111,9 +106,6 @@ def heat_bath(state, neighbours, temp=1, j_coupling=1, magnetic_field=1, steps=1
     
     return: Final state after a perturbation
     """
-
-    energy_total = 0
-
     for step in range(steps):
         position = np.random.randint(0, len(state))
         local_field = 0
@@ -142,7 +134,6 @@ def checkerboard(state, neighbours, temp=1, j_coupling=1, magnetic_field=1, step
     
     return: Final state after a perturbation
     """
-
     for step in numba.prange(steps):
         propabilities = np.random.rand(len(state))
         # print(state)

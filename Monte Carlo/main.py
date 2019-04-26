@@ -37,9 +37,9 @@ if __name__ == "__main__":
     print('Monte Carlo simulation of the Ising model started')
     
     # Initial values
-    headless = True
+    headless = False
     j_coupling = 1
-    temp = 2 / (np.log(1 + np.sqrt(2)))
+    temp = 2 / (np.log(1 + np.sqrt(2))) # Critical temperature
     
    
     simulation_state = Dynamics(j_coupling, temp, algorithm='Metropolis')
