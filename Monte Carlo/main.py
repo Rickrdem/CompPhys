@@ -15,7 +15,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-
 import observables as obs
 from dynamics import Dynamics
 from viewer import Viewer
@@ -41,9 +40,9 @@ if __name__ == "__main__":
     headless = True
     j_coupling = 1
     temp = 2 / (np.log(1 + np.sqrt(2)))
-#    temp = 1
     
-    simulation_state = Dynamics(j_coupling, temp, algorithm='Checkerboard')
+   
+    simulation_state = Dynamics(j_coupling, temp, algorithm='Metropolis')
     print('Simulation state created')
         
     if headless:
@@ -53,7 +52,8 @@ if __name__ == "__main__":
             progress(i, iterations)
     else: 
         viewport = Viewer(simulation_state)
-
+        plt.show()
+            
         
     start = 200
     if len(simulation_state.magnetization) > start:
