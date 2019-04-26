@@ -8,17 +8,17 @@ import numba
 @numba.njit()
 def metropolis(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=100):
     """
-    Metrpolis algorithm.
+    Metropolis algorithm.
     
     :param state (1d array): spin of each point 
-    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+    :param neighbours (Nx4 array): contains indices of 4 neighbours of each
                                     spin point
     :param temp (float): Temperature.
     :param j_coupling (float): Spin-spin coupling.
     :param magnetic_field (float): External magnetic field
     :param steps (int): number of iterations.
     
-    return: Final state after a pertubation
+    return: Final state after a perturbation
     """
     # rows, columns = state.shape
 
@@ -43,73 +43,57 @@ def wolff(state, neighbours, temp=1, j_coupling=1, magnetic_field=0, steps=100):
     Wolff algorithm.
     
     :param state (1d array): spin of each point 
-    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+    :param neighbours (Nx4 array): contains indices of 4 neighbours of each
                                     spin point
     :param temp (float): Temperature.
     :param j_coupling (float): Spin-spin coupling.
     :param magnetic_field (float): External magnetic field
     :param steps (int): number of iterations.
     
-    return: Final state after a pertubation
+    return: Final state after a perturbation
     """
     # rows, columns = state.shape
-    propability = 1. - np.exp(-2*j_coupling/temp)
-    propability_field = 1 - np.exp(-2*np.abs(magnetic_field)/temp)
-    print(propability,propability_field)
-    # energy = np.empty(steps)
-    field_spin = np.sign(magnetic_field)
+
+    ghost_spin = -1  # we use a ghost spin at index '-1' that we use to model the effect of the external magnetic field
 
     for step in range(steps):
-        # energy[step] = np.sum(state)
-        # location = (np.random.randint(0,rows), np.random.randint(0,columns))
         location = np.random.randint(0,len(state))  # random site to start
 
         queue = [location]
         cluster = [location]
 
         while len(queue) > 0:  # while there are elements left
-            # current = np.random.choice(np.array(queue))
-            current = queue.pop()
+            newqueue = queue.copy()
+            queue.clear()
+            for current in newqueue:
 
+                if current < 0:  # the 'ghost spin' that represents the field
+                    nearest_neighbours = []
+                    for i in range(len(state)):
+                        if i not in cluster:
+                            nearest_neighbours.append(i)
+                else:
+                    nearest_neighbours = [-1]
+                    for i in neighbours[current]:
+                        if i not in cluster:
+                            nearest_neighbours.append(i)
 
-            if current < 0:  # the 'ghost spin' that represents the field
-                nearest_neighbours = []
-                for i in state:
-                    nearest_neighbours.append(i)
-                # print('Current value is the external spin')
-            else:
-                nearest_neighbours = [-1]
-                for i in neighbours[current]:
-                    nearest_neighbours.append(i)
-                # nearest_neighbours.append(-1)
-                # print('Current value in array')
+                for neighbour in nearest_neighbours:
+                    if neighbour not in cluster:
+                        if neighbour == -1:  # neighbour is the ghost
+                            delta_z = -2*magnetic_field * state[current] * ghost_spin
+                        elif current == -1:  # current is the ghost
+                            delta_z = -2*magnetic_field * state[neighbour] * ghost_spin
+                        else:
+                            delta_z = -2*j_coupling * state[neighbour] * state[current]
 
-            for neighbour in nearest_neighbours:
-                if neighbour not in cluster:
-                    if neighbour > 0 and current > 0:
-                        if state[current] * state[neighbour]==1*np.sign(j_coupling) and np.random.rand() < propability:
+                        if np.random.rand() < (1-np.exp(delta_z/temp)):
                             queue.append(neighbour)
                             cluster.append(neighbour)
-                  # current or neighbour is in the external field
-                    elif neighbour < 0:
-                        if state[current]*field_spin*np.sign(magnetic_field)>0 and np.random.rand() < propability_field:
-                            queue.append(neighbour)
-                            cluster.append(neighbour)
-                            print('added current')
-                    elif current < 0:
-                        if state[neighbour]*field_spin*np.sign(magnetic_field)>0 and np.random.rand() < propability_field:
-                            queue.append(neighbour)
-                            cluster.append(neighbour)
-                            print('added neighbour')
-                        print(state[neighbour]*field_spin*np.sign(magnetic_field))
-            # queue.remove(current)
-        toflip = cluster
-        print(toflip)
-        for current in toflip:
-            if current > 0:
-                state[current] *= -1
-            else:
-                field_spin *= -1
+                if current == -1:
+                    ghost_spin *= -1
+                else:
+                    state[current] *= -1
     return state
 
 @numba.njit()
@@ -118,14 +102,14 @@ def heat_bath(state, neighbours, temp=1, j_coupling=1, magnetic_field=1, steps=1
     Heat Bath algorithm.
     
     :param state (1d array): spin of each point (num_spins points)
-    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+    :param neighbours (Nx4 array): contains indices of 4 neighbours of each
                                     spin point
     :param temp (float): Temperature.
     :param j_coupling (float): Spin-spin coupling.
     :param magnetic_field (float): External magnetic field
     :param steps (int): number of iterations.
     
-    return: Final state after a pertubation
+    return: Final state after a perturbation
     """
 
     energy_total = 0
@@ -149,21 +133,21 @@ def checkerboard(state, neighbours, temp=1, j_coupling=1, magnetic_field=1, step
     Chekerboard algorithm.
     
     :param state (1d array): spin of each point (num_spins points)
-    :param neighbours (Nx4 array): contains indeces of 4 neigbours of each 
+    :param neighbours (Nx4 array): contains indices of 4 neighbours of each
                                     spin point
     :param temp (float): Temperature.
     :param j_coupling (float): Spin-spin coupling.
     :param magnetic_field (float): External magnetic field
     :param steps (int): number of iterations.
     
-    return: Final state after a pertubation
+    return: Final state after a perturbation
     """
 
     for step in numba.prange(steps):
         propabilities = np.random.rand(len(state))
         # print(state)
         # even
-        for i in range(len(state)//2):
+        for i in numba.prange(len(state)//2):
             index = i*2
             delta_E = 0
             for j in neighbours[index]:
@@ -185,5 +169,4 @@ def checkerboard(state, neighbours, temp=1, j_coupling=1, magnetic_field=1, step
             elif propabilities[index] > np.exp(-1 * delta_E / temp):
                 continue
             state[index] *= -1
-
     return state
