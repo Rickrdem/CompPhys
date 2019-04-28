@@ -18,13 +18,13 @@ class Dynamics():
     :param temp (float): The initial temperature.
     """
 
-    def __init__(self, j_coupling, temp, algorithm='Metropolis'):
+    def __init__(self, j_coupling, temp, magnetic_field=0, algorithm='Metropolis'):
         self.rows = self.columns = 100
         self.num_spins = self.rows * self.columns
         self.spinchoice = [1,-1]
         self.j_coupling = j_coupling
         self.temp = temp
-        self.magnetic_field = 0
+        self.magnetic_field = magnetic_field
         
         self.steps_per_refresh = 100
 
