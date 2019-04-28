@@ -116,7 +116,6 @@ def heat_bath(state, neighbours, temp=1, j_coupling=1, magnetic_field=1, steps=1
             state[position] = 1
         else:
             state[position] = -1
-
     return state
 
 @numba.njit(parallel=True)
