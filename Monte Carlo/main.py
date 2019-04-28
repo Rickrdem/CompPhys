@@ -6,7 +6,7 @@ The program consists of 5 files:
     observables.py, 
     monte_carlo.py, 
     dynamics.py and
-    viewport.py
+    viewer.py
 The program is started by running main.py. 
 @author: Lennard Kwakernaak (1691988)
 @author: Rick Rodrigues de Mercado (1687115)
