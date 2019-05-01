@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 from matplotlib import cm
 import matplotlib.patches as mpatches
-#import time
 import matplotlib.animation as animation
 
 class Viewer():
