@@ -8,7 +8,6 @@ import scipy.ndimage as ndi
 import matplotlib.mlab as mlab
 import scipy.stats as stats
 
-
 def trim_data(simulation_state, start, end=None):
     """
     Trim the data to remove a set of time steps.
@@ -103,13 +102,17 @@ def nn_interaction(shape):
     return np.sum(m*shape)
 
 def energy(state, j_coupling=1, H=0):
-    """ Hamiltonian operator on a state vector for free bounds"""
+    """ 
+    Hamiltonian operator on a state vector for free bounds
+    """
     footprint = np.array([[0,1,0],[1,1,1],[0,1,0]])
     return -j_coupling * np.sum(ndi.generic_filter(
         state, function=nn_interaction, footprint=footprint, mode='wrap'))
 
 def bootstrap(data, function, n=100):
-    """Bootstrap an observable, given a specific function"""
+    """
+    Bootstrap an observable, given a specific function
+    """
     observables = []
     for i in range(n):
         resampled = np.random.choice(data, size=len(data), replace=True)

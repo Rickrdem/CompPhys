@@ -23,7 +23,7 @@ class Viewer():
     TEMP_STEP = 1e-4
     MAXSPEED = 300
     MINCOUPLING = -5
-    MAXCOUPLING = 200
+    MAXCOUPLING = 5
     COUPLING_STEP = 0.01
     MINFIELD = -5
     MAXFIELD = 5
