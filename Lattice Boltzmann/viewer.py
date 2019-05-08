@@ -3,13 +3,18 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib import animation
 
-# def density(flow):
-#     # return flow[:,:,0]
-#     return np.sum(flow, axis=-1)
+def density(flow):
+    mag = np.sum(flow, axis=-1)
+    mag -= np.min(mag)
+    mag /= np.max(mag)
+    mag = np.nan_to_num(mag)
+    return mag
 
 def normalised_magnitude(velocity):
     mag = np.sqrt(np.sum(np.square(velocity), axis=-1))
-    mag /= np.average(mag)
+    mag -= np.min(mag)
+    mag /= np.max(mag)
+    mag = np.nan_to_num(mag)
     return mag
 
 class Viewer():
@@ -19,7 +24,8 @@ class Viewer():
 
     def _init_matplotlib(self):
         self.fig = plt.figure()
-        self.ax = plt.imshow(normalised_magnitude(self.state.velocity) / 5, cmap=cm.viridis, animated=True)
+        self.ax = plt.imshow(normalised_magnitude(self.state.velocity), cmap=cm.viridis, animated=True)
+        self.fig.colorbar(self.ax)
 
         self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=1)
 
