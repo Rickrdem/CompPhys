@@ -1,5 +1,5 @@
 import numpy as np
-from latticeboltzmann import collision, streaming, flow_equilibrium, update
+from latticeboltzmann import collision, streaming, flow_equilibrium, update, initial_velocity
 
 class Dynamics():
     def __init__(self, xsize=520, ysize=180):
@@ -22,7 +22,7 @@ class Dynamics():
         self.init_lattice()
 
     def init_lattice(self):
-        self.velocity = np.fromfunction(lambda x,y,d: np.sin(x/4)/10000 - np.cos(y/20)/10000, (self.shape[0], self.shape[1], 2))
+        self.velocity = initial_velocity(np.arange(self.velocity.shape[0]), np.arange(self.velocity.shape[1]))#np.fromfunction(lambda x,y,d: np.sin(x/4)/10000 - np.cos(y/20)/10000, (self.shape[0], self.shape[1], 2))
         self.flowin = flow_equilibrium(self.velocity)
 
     def update(self):
