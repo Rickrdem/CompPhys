@@ -1,11 +1,11 @@
 import numpy as np
 from numba import njit, jit
 
-lattice_velocity = np.array([(x, y) for y in [-1, 0, 1] for x in [-1, 0, 1]], dtype=np.float)
+LATTICE_VELOCITY = np.array([(x, y) for y in [-1, 0, 1] for x in [-1, 0, 1]], dtype=np.float)
 
-lattice_weight = np.array([1 / 9 for i in range(9)])
-lattice_weight[::2] = [1 / 36 for i in lattice_weight[::2]]
-lattice_weight[4] = 4 / 9
+LATTICE_WEIGHT = np.array([1 / 9 for i in range(9)])
+LATTICE_WEIGHT[::2] = [1 / 36 for i in LATTICE_WEIGHT[::2]]
+LATTICE_WEIGHT[4] = 4 / 9
 
 VELOCITY_C = 1 / np.sqrt(3)  # sound velocity/ not sure why 2/sqrt(3) works but 1/sqrt(3) doesn't
 TIME_C = 1
@@ -23,14 +23,14 @@ def collision(flowin):
             velocity = np.array([0., 0.])
             for i in range(connections):
                 density += flowin[x, y, i]
-                velocity += flowin[x, y, i] * lattice_velocity[i]
+                velocity += flowin[x, y, i] * LATTICE_VELOCITY[i]
             if density != 0: velocity /= density
             velocity/=2
             # else: velocity*=0
             for i in range(connections):
-                product = lattice_velocity[i] @ velocity
+                product = LATTICE_VELOCITY[i] @ velocity
                 velocity_squared = velocity @ velocity
-                flow_eq[x,y,i] = lattice_weight[i] * density * (
+                flow_eq[x,y,i] = LATTICE_WEIGHT[i] * density * (
                         1+product / (VELOCITY_C ** 2) +
                         product**2 / (2 * VELOCITY_C ** 4) -
                         velocity_squared / (2 * VELOCITY_C ** 2)
@@ -47,9 +47,9 @@ def flow_equilibrium(velocity, density=1):
     for x in range(xsize):
         for y in range(ysize):
             for i in range(connections):
-                product = lattice_velocity[i] @ velocity[x,y].T
+                product = LATTICE_VELOCITY[i] @ velocity[x, y].T
                 velocity_squared = velocity[x,y] @ velocity[x,y].T
-                flow_eq[x, y ,i] = lattice_weight[i] * density * (
+                flow_eq[x, y ,i] = LATTICE_WEIGHT[i] * density * (
                         1 + product / VELOCITY_C ** 2 +
                         np.square(product) / (2 * VELOCITY_C ** 4) -
                         velocity_squared / (2 * VELOCITY_C ** 2)
@@ -74,8 +74,8 @@ def streaming(flowout):
     for x in range(xsize):
         for y in range(ysize):
             for i in range(connections):  # periodic boundarie
-                x_neighbour = (x+int(lattice_velocity[i][0]))%xsize
-                y_neighbour = (y+int(lattice_velocity[i][1]))%ysize
+                x_neighbour = (x + int(LATTICE_VELOCITY[i][0])) % xsize
+                y_neighbour = (y + int(LATTICE_VELOCITY[i][1])) % ysize
                 flowin[int(x_neighbour), int(y_neighbour), i] = flowout[x, y, i]
                 flowin[x_neighbour, y_neighbour, 4] = flowout[x_neighbour, y_neighbour, 4]
     return flowin
@@ -87,21 +87,21 @@ def boundary_correction(flowin):
 
     density = np.sum(flowin[0,:,:], axis=-1)
     left_wall_velocity = np.empty((ysize, 2))
-    left_wall_velocity[:,:] = np.sum(flowin[0,:,:,None] * lattice_velocity[None, :], axis=1)
+    left_wall_velocity[:,:] = np.sum(flowin[0,:,:,None] * LATTICE_VELOCITY[None, :], axis=1)
     left_wall_velocity/=density[:,None]
 
     flow_eq = np.zeros((ysize, 9))
 
     for y in range(ysize):
         for i in range(connections):
-            product = lattice_velocity[i] @ left_wall_velocity[y].T
+            product = LATTICE_VELOCITY[i] @ left_wall_velocity[y].T
             velocity_squared = left_wall_velocity[y] @ left_wall_velocity[y].T
-            a = lattice_weight[i] * density[i] * (
+            a = LATTICE_WEIGHT[i] * density[i] * (
                     1 + product / VELOCITY_C ** 2 +
                     product**2 / (2 * VELOCITY_C ** 4) -
                     velocity_squared / (2 * VELOCITY_C ** 2)
             )
-            # print(a, product, velocity_squared, lattice_weight[i])
+            # print(a, product, velocity_squared, LATTICE_WEIGHT[i])
             flow_eq[y, i] = a
 
     flowin[0,:,0:3] = 0.001#flow_eq[:,0:3]
@@ -125,5 +125,5 @@ def update(flowin, mask, steps=10):
 
         flowin = streaming(flowout)
     density = np.sum(flowin, axis=-1)
-    velocity = np.sum(flowin[:,:,:,None] * lattice_velocity[None,None,:], axis=2)/density[:,:,None]
+    velocity = np.sum(flowin[:,:,:,None] * LATTICE_VELOCITY[None, None, :], axis=2) / density[:, :, None]
     return flowin, velocity
