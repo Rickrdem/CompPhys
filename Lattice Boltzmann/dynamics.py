@@ -8,12 +8,14 @@ class Dynamics():
         self.flowin = np.zeros(self.shape)
         self.flowout = self.flowin.copy()
         self.floweq = self.flowin.copy()
+
         self.velocity = np.empty(xsize, ysize, 2)
 
         self.reynolds = 220.
         self.influx_v = 0.4  # the velocity in lattice units of the ingoing flow
 
         self.masked_off = np.zeros((self.shape[0], self.shape[1]), dtype=bool)
+
         self.masked_off[10:15,30:40] = True
         self.masked_off[10:15, 44:60] = True
 
