@@ -7,11 +7,15 @@ LATTICE_WEIGHT = np.array([1 / 9 for i in range(9)])
 LATTICE_WEIGHT[::2] = [1 / 36 for i in LATTICE_WEIGHT[::2]]
 LATTICE_WEIGHT[4] = 4 / 9
 
-VELOCITY_C = 1 / np.sqrt(3)  # sound velocity/ not sure why 2/sqrt(3) works but 1/sqrt(3) doesn't
-TIME_C = 0.5
-
 def initial_velocity(x, y):
     return np.fromfunction(lambda x,y,d:(d-1)*(0.01+0.0001*np.sin(x/10)), (len(x), len(y), 2))
+
+VELOCITY_C = 1 / np.sqrt(3)         # sound velocity/ not sure why 2/sqrt(3) works but 1/sqrt(3) doesn't
+
+ULB = 0.04                          # Velocity in lattice units.
+r = 5                               # Radius of obstacle
+Re = 220.                           # Reynolds number
+TIME_C = 1.0 / (3.*(ULB*r/Re)+0.5)  # Relaxation parameter.
 
 @njit()
 def macroscopic_parameters(flowin):
