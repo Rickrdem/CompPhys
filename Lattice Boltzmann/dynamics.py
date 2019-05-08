@@ -14,10 +14,15 @@ class Dynamics():
         self.reynolds = 220.
         self.influx_v = 0.4  # the velocity in lattice units of the ingoing flow
 
-        self.masked_off = np.zeros((self.shape[0], self.shape[1]), dtype=bool)
+        # self.masked_off = np.zeros((self.shape[0], self.shape[1]), dtype=bool)
+        #
+        # self.masked_off[10:15,30:40] = True
+        # self.masked_off[10:15, 44:60] = True
 
-        self.masked_off[10:15,30:40] = True
-        self.masked_off[10:15, 44:60] = True
+        xc = xsize / 4
+        yc = ysize / 2
+        r = 5
+        self.masked_off= np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize))
 
         self.init_lattice()
 
