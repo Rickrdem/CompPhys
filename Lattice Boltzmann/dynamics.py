@@ -9,7 +9,7 @@ class Dynamics():
         self.flowout = self.flowin.copy()
         self.floweq = self.flowin.copy()
 
-        self.velocity = np.empty(xsize, ysize, 2)
+        self.velocity = np.empty((xsize, ysize, 2))
 
         self.reynolds = 220.
         self.influx_v = 0.4  # the velocity in lattice units of the ingoing flow
