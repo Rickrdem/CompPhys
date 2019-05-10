@@ -12,9 +12,9 @@ def density(flow):
 
 def normalised_magnitude(velocity):
     mag = np.sqrt(np.sum(np.square(velocity), axis=-1))
-    mag -= np.min(mag)
-    mag /= np.max(mag)
-    mag = np.nan_to_num(mag)
+    # mag -= np.min(mag)
+    # mag /= np.max(mag)
+    # mag = np.nan_to_num(mag)
     return mag
 
 class Viewer():
@@ -24,12 +24,12 @@ class Viewer():
 
     def _init_matplotlib(self):
         self.fig = plt.figure()
-        self.ax = plt.imshow(normalised_magnitude(self.state.velocity), cmap=cm.viridis, animated=True)
+        self.ax = plt.imshow(normalised_magnitude(self.state.velocity).T, cmap=cm.Reds, animated=True, vmin=0, vmax=0.08)
         self.fig.colorbar(self.ax)
 
         self.animation_handler = animation.FuncAnimation(self.fig, self.update, blit=True, interval=1)
 
     def update(self, *args):
         self.state.update()
-        self.ax.set_array(normalised_magnitude(self.state.velocity))
+        self.ax.set_array(normalised_magnitude(self.state.velocity).T)
         return self.ax,
