@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit, jit
+from numba import njit, jit, typeof
 
 LATTICE_VELOCITY = np.array([(x, y) for y in [-1, 0, 1] for x in [-1, 0, 1]], dtype=np.float)
 
@@ -7,27 +7,41 @@ LATTICE_WEIGHT = np.array([1 / 9 for i in range(9)])
 LATTICE_WEIGHT[::2] = [1 / 36 for i in LATTICE_WEIGHT[::2]]
 LATTICE_WEIGHT[4] = 4 / 9
 
-def initial_velocity(x, y):
-    return np.fromfunction(lambda x,y,d:(d-1)*(0.01+0.0001*np.sin(x/10)), (len(x), len(y), 2))
 
 VELOCITY_C = 1 / np.sqrt(3)         # sound velocity/ not sure why 2/sqrt(3) works but 1/sqrt(3) doesn't
 
 ULB = 0.04                          # Velocity in lattice units.
-r = 5                               # Radius of obstacle
+r = 180/9                            # Radius of obstacle
 Re = 220.                           # Reynolds number
 TIME_C = 1.0 / (3.*(ULB*r/Re)+0.5)  # Relaxation parameter.
 
 @njit()
+def initial_velocity(x, y):
+    # d = np.array([0,1])
+    # return 1/100*(d[None, None, :]-1)*(0.1+0.01*np.sin(y[None, :, None]/30)) + 0*x[:, None, None]
+    velocity = np.empty((len(x), len(y), 2))
+    for i, x_val in enumerate(x):
+        for j, y_val in enumerate(y):
+            for d in range(2):
+                velocity[i,j,d] = 0.04*(1-d)*(1+1e-4*np.sin(y_val/179*2*np.pi))
+    return velocity
+    # def func(x,y,d):
+    #     return 1/100*(d-1)*(0.1+0.01*np.sin(y/30))
+    # return np.fromfunction(func, (len(x), len(y), 2))
+
+v = initial_velocity(np.arange(4), np.arange(4))
+print(v)
+@njit()
 def macroscopic_parameters(flowin):
     xsize, ysize, connections = flowin.shape
     velocity = np.zeros((xsize, ysize, 2))
-    density = np.zeros((xsize,ysize))
+    density = np.zeros((xsize, ysize))
     for x in range(xsize):
         for y in range(ysize):
             for i in range(connections):
                 delta_density = flowin[x, y, i]
                 density[x,y] += delta_density
-                velocity[x,y] += flowin[x, y, i]*LATTICE_VELOCITY[i]#/delta_density
+                velocity[x,y] += flowin[x, y, i]*LATTICE_VELOCITY[i]  # /delta_density
             # velocity[x,y] /= density[x,y]
     # velocity /= density
     return velocity, density
@@ -40,8 +54,8 @@ def collision(flowin, floweq):
     return flowout
 
 
-@jit()
-def flow_equilibrium(velocity, density=1):
+@njit()
+def flow_equilibrium(velocity, density):
     xsize, ysize, dimensions = velocity.shape
     connections = 9
     flow_eq = np.empty((xsize, ysize, connections))
@@ -49,13 +63,13 @@ def flow_equilibrium(velocity, density=1):
     for x in range(xsize):
         for y in range(ysize):
             for i in range(connections):
-                if type(velocity) is type(density):
-                    d = density[x,y]
-                else:
-                    d = density
+                # if type(velocity) is type(density):
+                #     d = density[x,y]
+                # else:
+                #     d = density
                 product = LATTICE_VELOCITY[i] @ velocity[x, y].T
                 velocity_squared = velocity[x, y] @ velocity[x, y].T
-                flow_eq[x, y, i] = LATTICE_WEIGHT[i] * d * (
+                flow_eq[x, y, i] = LATTICE_WEIGHT[i] * density[x,y] * (
                         1 + product / VELOCITY_C ** 2 +
                         np.square(product) / (2 * VELOCITY_C ** 4) -
                         velocity_squared / (2 * VELOCITY_C ** 2)
@@ -70,7 +84,7 @@ def obstacle_flip(flowin, flowout, mask):
         for y in range(ysize):
             if mask[x, y]:
                 for i in range(connections):
-                    flowout[x, y, 8 - i] = flowin[x, y, i]
+                    flowout[x, y, i] = flowin[x, y, 8-i]
     return flowout
 
 
@@ -81,11 +95,13 @@ def streaming(flowout):
     flowin = np.zeros_like(flowout)
     for x in range(xsize):
         for y in range(ysize):
-            for i in range(connections):  # periodic boundarie
+            for i in range(connections):  # periodic boundaries
                 x_neighbour = (x + int(LATTICE_VELOCITY[i][0])) %xsize
                 y_neighbour = (y + int(LATTICE_VELOCITY[i][1])) %ysize
                 if xsize > x_neighbour >= 0:
                     if ysize > y_neighbour >= 0:
+                        # flowin[x, y, i] = flowout[x_neighbour, y_neighbour, i]
+                        # flowin[x, y, 4] = flowout[x, y, 4]
                         flowin[int(x_neighbour), int(y_neighbour), i] = flowout[x, y, i]
                         flowin[x_neighbour, y_neighbour, 4] = flowout[x_neighbour, y_neighbour, 4]
     return flowin
@@ -124,13 +140,16 @@ def streaming(flowout):
 #     return flowin
 
 
-# @njit()
+@jit()
 def update(flowin, mask, steps=10):
     for step in range(steps):
         flowin[-1, :, 6:9] = flowin[-2, :, 6:9]  # outflow on the right wall
         #
         velocity,density = macroscopic_parameters(flowin)
         velocity/=density[:,:,None]
+
+        print(velocity[0:4, 0:4])
+
         # left wall #############
         xsize, ysize, connections = flowin.shape
         velocity[0, :, :] = initial_velocity(np.arange(1), np.arange(ysize))
