@@ -5,16 +5,13 @@ from matplotlib import animation
 
 def density(flow):
     mag = np.sum(flow, axis=-1)
-    mag -= np.min(mag)
-    mag /= np.max(mag)
-    mag = np.nan_to_num(mag)
+    # mag -= np.min(mag)
+    # mag /= np.max(mag)
+    # mag = np.nan_to_num(mag)
     return mag
 
 def normalised_magnitude(velocity):
     mag = np.sqrt(np.sum(np.square(velocity), axis=-1))
-    # mag -= np.min(mag)
-    # mag /= np.max(mag)
-    # mag = np.nan_to_num(mag)
     return mag
 
 class Viewer():
