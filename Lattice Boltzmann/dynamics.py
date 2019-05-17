@@ -16,6 +16,9 @@ class Dynamics():
         self.reynolds = 220.
         self.influx_v = 0.04  # the velocity in lattice units of the ingoing flow
 
+        self.steps_per_update = 5
+        self.elapsed_time = 0
+
         # self.masked_off = np.zeros((self.shape[0], self.shape[1]), dtype=bool)
         #
         # self.masked_off[10:15,30:40] = True
@@ -33,5 +36,8 @@ class Dynamics():
         self.flowin = flow_equilibrium(self.velocity, np.ones((self.shape[0], self.shape[1])))
 
     def update(self):
-        self.flowin, self.velocity = update(self.flowin, self.masked_off, steps=10)
+
+        self.flowin, self.velocity = update(self.flowin, self.masked_off, steps=self.steps_per_update)
+        self.elapsed_time += self.steps_per_update
+        print(self.elapsed_time)
         return self.velocity
