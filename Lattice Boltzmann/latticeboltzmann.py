@@ -23,14 +23,27 @@ def initial_velocity(x, y):
     for i, x_val in enumerate(x):
         for j, y_val in enumerate(y):
             for d in range(2):
-                velocity[i,j,d] = 0.04*(1-d)*(1+1e-4*np.sin(y_val/179*2*np.pi))
+                velocity[i, j, d] = 0.04*(1-d)*(1+1e-2*np.sin(y_val/179*2*np.pi))
     return velocity
     # def func(x,y,d):
     #     return 1/100*(d-1)*(0.1+0.01*np.sin(y/30))
     # return np.fromfunction(func, (len(x), len(y), 2))
 
-v = initial_velocity(np.arange(4), np.arange(4))
-print(v)
+
+@njit()
+def influx(y):
+    """
+    Incoming fluid stream at left boundary
+    :param y: y-coordinate at the left boundary
+    :return: fluid velocity
+    """
+    velocity = np.empty((len(y), 2))
+    for j, y_val in enumerate(y):
+        for d in range(2):
+            velocity[j, d] = 0.04*(1-d)*(1+1e-2*np.sin(y_val/179*2*np.pi))
+    return velocity
+
+
 @njit()
 def macroscopic_parameters(flowin):
     xsize, ysize, connections = flowin.shape
@@ -40,10 +53,8 @@ def macroscopic_parameters(flowin):
         for y in range(ysize):
             for i in range(connections):
                 delta_density = flowin[x, y, i]
-                density[x,y] += delta_density
-                velocity[x,y] += flowin[x, y, i]*LATTICE_VELOCITY[i]  # /delta_density
-            # velocity[x,y] /= density[x,y]
-    # velocity /= density
+                density[x, y] += delta_density
+                velocity[x, y] += flowin[x, y, i] * LATTICE_VELOCITY[i]
     return velocity, density
 
 @njit()
@@ -98,12 +109,11 @@ def streaming(flowout):
             for i in range(connections):  # periodic boundaries
                 x_neighbour = (x + int(LATTICE_VELOCITY[i][0])) %xsize
                 y_neighbour = (y + int(LATTICE_VELOCITY[i][1])) %ysize
-                if xsize > x_neighbour >= 0:
-                    if ysize > y_neighbour >= 0:
-                        # flowin[x, y, i] = flowout[x_neighbour, y_neighbour, i]
-                        # flowin[x, y, 4] = flowout[x, y, 4]
-                        flowin[int(x_neighbour), int(y_neighbour), i] = flowout[x, y, i]
-                        flowin[x_neighbour, y_neighbour, 4] = flowout[x_neighbour, y_neighbour, 4]
+                if xsize > x_neighbour >= 0 and ysize > y_neighbour >= 0:
+                    # flowin[x, y, i] = flowout[x_neighbour, y_neighbour, i]
+                    # flowin[x, y, 4] = flowout[x, y, 4]
+                    flowin[int(x_neighbour), int(y_neighbour), i] = flowout[x, y, i]
+                    flowin[x_neighbour, y_neighbour, 4] = flowout[x_neighbour, y_neighbour, 4]
     return flowin
 
 
@@ -140,19 +150,18 @@ def streaming(flowout):
 #     return flowin
 
 
-@jit()
+@njit()
 def update(flowin, mask, steps=10):
     for step in range(steps):
         flowin[-1, :, 6:9] = flowin[-2, :, 6:9]  # outflow on the right wall
         #
-        velocity,density = macroscopic_parameters(flowin)
-        velocity/=density[:,:,None]
-
-        print(velocity[0:4, 0:4])
+        velocity, density = macroscopic_parameters(flowin)
+        velocity[:, :, 0] /= density[:, :]
+        velocity[:, :, 1] /= density[:, :]
 
         # left wall #############
         xsize, ysize, connections = flowin.shape
-        velocity[0, :, :] = initial_velocity(np.arange(1), np.arange(ysize))
+        velocity[0, :, :] = influx(np.arange(ysize))
         density[0, :] = 1. / (1. - velocity[0, :, 0]) * (np.sum(flowin[0, :, 3:6], axis=-1) + 2. * np.sum(flowin[0, :, 0:3], axis=-1))
         ##############
 
