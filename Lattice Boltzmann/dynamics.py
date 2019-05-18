@@ -27,7 +27,7 @@ class Dynamics():
         xc = xsize / 4
         yc = ysize / 2
         r = ysize/9
-        self.masked_off= np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize)
+        self.masked_off= np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize))
         self.masked_off[:,0] = 1
         self.masked_off[:,-1] = 1
 
