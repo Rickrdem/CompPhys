@@ -27,7 +27,9 @@ class Dynamics():
         xc = xsize / 4
         yc = ysize / 2
         r = ysize/9
-        self.masked_off= np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize))
+        self.masked_off= np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize)
+        self.masked_off[:,0] = 1
+        self.masked_off[:,-1] = 1
 
         self.init_lattice()
 
@@ -36,7 +38,6 @@ class Dynamics():
         self.flowin = flow_equilibrium(self.velocity, np.ones((self.shape[0], self.shape[1])))
 
     def update(self):
-
         self.flowin, self.velocity = update(self.flowin, self.masked_off, steps=self.steps_per_update)
         self.elapsed_time += self.steps_per_update
         print(self.elapsed_time)
