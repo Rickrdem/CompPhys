@@ -4,7 +4,7 @@ from latticeboltzmann import collision, streaming, flow_equilibrium, update, ini
 class Dynamics():
 
 
-    def __init__(self, xsize=520, ysize=180):
+    def __init__(self, xsize=520, ysize=180, show_every=10):
         self.n_neighbours = 9  # simple square lattice
         self.shape = (xsize, ysize, self.n_neighbours)
         self.flowin = np.zeros(self.shape)
@@ -16,20 +16,29 @@ class Dynamics():
         self.reynolds = 220.
         self.influx_v = 0.04  # the velocity in lattice units of the ingoing flow
 
-        self.steps_per_update = 5
+        self.steps_per_update = show_every
         self.elapsed_time = 0
 
-        # self.masked_off = np.zeros((self.shape[0], self.shape[1]), dtype=bool)
-        #
-        # self.masked_off[10:15,30:40] = True
-        # self.masked_off[10:15, 44:60] = True
 
+        #  Single obstable
         xc = xsize / 4
         yc = ysize / 2
         r = ysize/9
-        self.masked_off= np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize))
-        self.masked_off[:,0] = 1
-        self.masked_off[:,-1] = 1
+        self.masked_off = np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - yc) ** 2 < r ** 2, (xsize, ysize))
+
+
+        #  Multiple obstacles
+        # xc = xsize / 4
+        # yc = ysize / 10
+        # r = ysize/9
+        # self.masked_off1 = np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - 3*yc) ** 2 < r ** 2, (xsize, ysize))
+        # self.masked_off2 = np.fromfunction(lambda x, y: (x - xc) ** 2 + (y - 7*yc) ** 2 < r ** 2, (xsize, ysize))
+        # self.masked_off = np.any((self.masked_off1, self.masked_off2), axis=0)
+
+
+        self.masked_off[:, 0] = 1
+        self.masked_off[:, -1] = 1
+
 
         self.init_lattice()
 
