@@ -3,7 +3,8 @@ from viewer import Viewer
 import matplotlib.pyplot as plt
 
 def main():
-    state = Dynamics(xsize=400)
+    state = Dynamics(xsize=520, ysize=180, show_every=20)
+#    state = Dynamics(xsize=100, ysize=40, show_every=10)
     view = Viewer(state)
     plt.show()
     return state
